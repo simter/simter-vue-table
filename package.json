@@ -1,0 +1,35 @@
+{
+  "name": "simter-vue-table",
+  "version": "0.1.0",
+  "description": "Simter table component",
+  "main": "dist/simter-vue-table.js",
+  "module": "dist/simter-vue-table.esm.js",
+  "repository": "https://github.com/simter/simter-vue-table.git",
+  "author": "RJ.Hwang <rongjihuang@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "src",
+    "dist",
+    "docs",
+    "demo",
+    "rollup.config.js",
+    ".babelrc"
+  ],
+  "scripts": {
+    "dev": "parcel demo/index.html -d temp",
+    "clean": "rm -rf dist/* temp/*",
+    "build": " npm run clean && rollup -c && npm run min-js",
+    "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url"
+  },
+  "devDependencies": {
+    "simter-vue-colgroup": "^0.1.0",
+    "babel-preset-env": "^1.6.1",
+    "parcel-bundler": "^1.5.1",
+    "parcel-plugin-vue": "^1.5.0",
+    "rollup-plugin-vue": "^3.0.0",
+    "stylus": "^0.54.5",
+    "uglify-es": "^3.3.9",
+    "vue": "^2.5.13",
+    "vue-template-compiler": "^2.5.13"
+  }
+}
