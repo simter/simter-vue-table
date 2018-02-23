@@ -5,7 +5,13 @@ import vue from 'rollup-plugin-vue';
 export default {
   input: 'src/table.vue',
   output: [
-    { file: pkg.main, format: 'umd', name: pkg.name },
+    {
+      file: pkg.main, format: 'umd', name: pkg.name,
+      globals: {
+        "simter-vue-colgroup": "simter-vue-colgroup",
+        "simter-vue-thead": "simter-vue-thead"
+      }
+    },
     { file: pkg.module, format: 'es' }
   ],
   plugins: [

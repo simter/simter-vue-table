@@ -4,9 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name=viewport content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
-  <title>st-colgroup Demo</title>
+  <title>st-table</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>
-  <script src="https://rawgit.com/simter/simter-vue-table/master/dist/simter-vue-table.min.js"></script>
+  <script src="https://rawgit.com/simter/simter-vue-colgroup/0.1.0/dist/simter-vue-colgroup.min.js"></script>
+  <script src="https://rawgit.com/simter/simter-vue-thead/0.1.0/dist/simter-vue-thead.min.js"></script>
+  <script src="https://rawgit.com/simter/simter-vue-table/master/dist/simter-vue-table.js"></script>
   <style>
     body {background-color: #000; color: #888}
     .head {background-color: #444}
@@ -16,18 +18,18 @@
 </head>
 
 <body>
-  <h2>Simter <code>table</code> vue component.</h2>
+  <h2>simter-vue-table component.</h2>
   <a href="http://github.com/simter/simter-vue-table">Fork me on Github</a>
   <p>The target is to config the <code>table</code> by data config. 
     Use together with <a href="http://github.com/simter/simter-vue-colgroup">simter-vue-colgroup</a>
     and <a href="http://github.com/simter/simter-vue-thead">simter-vue-thead</a>
-     component.</p>
+     components inner.</p>
 
 <pre>
 // html
-&lt;st-table :columns="columns" :rows="rows"&gt;&lt;/st-table&gt;</pre>
+&lt;st-table :columns="columns" :rows="rows" border="1"&gt;&lt;/st-table&gt;</pre>
 
-  <h3>Example 1: Simple Columns</h3>
+  <h3>Example 1: Simple</h3>
 <pre>
 // vue data
 {
@@ -42,15 +44,16 @@
     { id1: "v13", id2: "v23", id3: "v33" }
   ]
 }
-If ignore `label` prop, use `id` prop instead.
 
-// Result
+// Expected result
 | Column1 | Column2 | Column3 |
 | v11     | v21     | v31     |
 | v12     | v22     | v32     |
 | v13     | v23     | v33     |
+
+// Actual result
 </pre>
-  <st-table id="demo1" :columns="columns" :rows="rows"></st-table>
+  <st-table id="demo1" :columns="columns" :rows="rows" border="1"></st-table>
 
   <script src="./index.js"></script>
 </body>
