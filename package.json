@@ -1,6 +1,6 @@
 {
   "name": "simter-vue-table",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simter table component",
   "main": "dist/simter-vue-table.js",
   "module": "dist/simter-vue-table.esm.js",
@@ -22,8 +22,8 @@
     "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url"
   },
   "devDependencies": {
-    "simter-vue-colgroup": "~0.1.0",
-    "simter-vue-thead": "~0.1.0",
+    "simter-vue-colgroup": "~0.1.1",
+    "simter-vue-thead": "~0.1.1",
     "babel-preset-env": "~1.6.1",
     "parcel-bundler": "~1.5.1",
     "parcel-plugin-vue": "~1.5.0",
