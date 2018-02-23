@@ -10,13 +10,13 @@
   "files": [
     "src",
     "dist",
+    "debug",
     "docs",
-    "demo",
     "rollup.config.js",
     ".babelrc"
   ],
   "scripts": {
-    "dev": "parcel demo/index.html -d temp",
+    "dev": "parcel debug/index.html -d temp",
     "clean": "rm -rf dist/* temp/*",
     "build": " npm run clean && rollup -c && npm run min-js",
     "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url"

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name=viewport content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
+  <title>st-table debug</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>
+  <style>
+    body {background-color: #000; color: #888}
+    .head {background-color: #444}
+    th {border: 1px solid #888}
+    a {color: #888}
+  </style>
+</head>
+
+<body>
+  <h2>Debug st-table component.</h2>
+
+<pre>
+// html
+&lt;st-table :columns="columns" :rows="rows"&gt;&lt;/st-table&gt;</pre>
+
+  <h3>Example 1: Simple</h3>
+<pre>
+// vue data
+{
+  columns: [
+    { id: "id1", label: "Column1", width: "100px" },
+    { id: "id2", label: "Column2", width: "100px" },
+    { id: "id3", label: "Column3", width: "100px" }
+  ],
+  rows: [
+    { id1: "v11", id2: "v21", id3: "v31" },
+    { id1: "v12", id2: "v22", id3: "v32" },
+    { id1: "v13", id2: "v23", id3: "v33" }
+  ]
+}
+
+// Expected result
+| Column1 | Column2 | Column3 |
+| v11     | v21     | v31     |
+| v12     | v22     | v32     |
+| v13     | v23     | v33     |
+
+// Actual result
+</pre>
+  <st-table id="demo1" :columns="columns" :rows="rows" border="1"></st-table>
+
+  <script src="./index.js"></script>
+</body>
+
+</html>
