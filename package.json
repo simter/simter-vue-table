@@ -24,9 +24,10 @@
   "scripts": {
     "start": "npm run dev",
     "dev": "parcel debug/index.html -d temp",
+    "test": "ava",
     "clean": "rm -rf dist/* temp/*",
-    "build": "npm run clean && rollup -c && npm run min-js",
     "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url",
+    "build": "npm run clean && npm test && rollup -c && npm run min-js",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
@@ -40,6 +41,17 @@
     "stylus": "~0.54.5",
     "uglify-es": "~3.3.9",
     "vue": "~2.5.13",
-    "vue-template-compiler": "~2.5.13"
+    "vue-template-compiler": "~2.5.13",
+    "ava": "~0.25.0",
+    "require-extension-hooks": "~0.3.2",
+    "require-extension-hooks-vue": "~0.4.1",
+    "require-extension-hooks-babel": "~0.1.1",
+    "browser-env": "~3.2.5"
+  },
+  "ava": {
+    "babel": "inherit",
+    "require": [
+      "./test/helpers/setup.js"
+    ]
   }
 }
