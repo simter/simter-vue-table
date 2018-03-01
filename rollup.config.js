@@ -21,6 +21,6 @@ export default {
     { file: pkg.module, format: 'es', banner: banner }
   ],
   plugins: [
-    vue({ compileTemplate: true, css: true })
+    vue({ compileTemplate: true, css: false })
   ]
 };
