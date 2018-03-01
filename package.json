@@ -2,6 +2,13 @@
   "name": "simter-vue-table",
   "version": "0.1.1",
   "description": "Simter table component",
+  "keywords": [
+    "simter",
+    "vue",
+    "table",
+    "rollup",
+    "parcel"
+  ],
   "main": "dist/simter-vue-table.js",
   "module": "dist/simter-vue-table.esm.js",
   "repository": "https://github.com/simter/simter-vue-table.git",
@@ -10,23 +17,25 @@
   "files": [
     "src",
     "dist",
-    "debug",
     "docs",
-    "rollup.config.js",
-    ".babelrc"
+    "debug",
+    "rollup.config.js"
   ],
   "scripts": {
+    "start": "npm run dev",
     "dev": "parcel debug/index.html -d temp",
     "clean": "rm -rf dist/* temp/*",
-    "build": " npm run clean && rollup -c && npm run min-js",
-    "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url"
+    "build": "npm run clean && rollup -c && npm run min-js",
+    "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "simter-vue-colgroup": "~0.1.1",
-    "simter-vue-thead": "~0.1.1",
+    "simter-vue-colgroup": "~0.2.5",
+    "simter-vue-thead": "~0.2.0",
     "babel-preset-env": "~1.6.1",
     "parcel-bundler": "~1.5.1",
     "parcel-plugin-vue": "~1.5.0",
+    "rollup": "~0.56.3",
     "rollup-plugin-vue": "~3.0.0",
     "stylus": "~0.54.5",
     "uglify-es": "~3.3.9",
