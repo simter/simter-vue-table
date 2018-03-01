@@ -26,8 +26,8 @@
     "dev": "parcel debug/index.html -d temp",
     "test": "ava",
     "clean": "rm -rf dist/* temp/*",
-    "min-js": "uglifyjs dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url",
     "build": "npm run clean && npm test && rollup -c && npm run min-js",
+    "min-js": "uglifyjs --comments /^!/ dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
