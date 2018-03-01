@@ -1,5 +1,6 @@
 import pkg from './package.json';
 import vue from 'rollup-plugin-vue';
+import resolve from 'rollup-plugin-node-resolve';
 
 let banner = `/*!
 * ${pkg.name} v${pkg.version}
@@ -21,6 +22,7 @@ export default {
     { file: pkg.module, format: 'es', banner: banner }
   ],
   plugins: [
+    resolve(),
     vue({ compileTemplate: true, css: false })
   ]
 };
