@@ -31,8 +31,8 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "simter-vue-colgroup": "~0.2.5",
     "simter-vue-thead": "~0.2.0",
+    "simter-vue-colgroup": "~0.2.6",
     "babel-preset-env": "~1.6.1",
     "parcel-bundler": "~1.5.1",
     "parcel-plugin-vue": "~1.5.0",
