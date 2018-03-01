@@ -4,56 +4,173 @@
 <head>
   <meta charset="UTF-8">
   <meta name=viewport content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
-  <title>st-table</title>
+  <title>st-table docs</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>
-  <script src="https://rawgit.com/simter/simter-vue-colgroup/0.1.0/dist/simter-vue-colgroup.min.js"></script>
-  <script src="https://rawgit.com/simter/simter-vue-thead/0.1.0/dist/simter-vue-thead.min.js"></script>
-  <script src="https://rawgit.com/simter/simter-vue-table/master/dist/simter-vue-table.js"></script>
+  <script src="https://rawgit.com/simter/simter-vue-table/0.2.0/dist/simter-vue-table.js"></script>
   <style>
-    body {background-color: #000; color: #888}
-    .head {background-color: #444}
-    th {border: 1px solid #888}
-    a {color: #888}
+    body { background-color: #000; color: #888 }
+    th { border: 1px solid #888 }
+    a { color: #888}
+    h1 { color: #eee }
+    h2, b, .template { color: #bbb }
+    .block { border-bottom: 1px solid #333 }
   </style>
 </head>
 
 <body>
-  <h2>simter-vue-table component.</h2>
-  <a href="http://github.com/simter/simter-vue-table">Fork me on Github</a>
-  <p>The target is to config the <code>table</code> by data config. 
-    Use together with <a href="http://github.com/simter/simter-vue-colgroup">simter-vue-colgroup</a>
-    and <a href="http://github.com/simter/simter-vue-thead">simter-vue-thead</a>
-     components inner.</p>
+  <h2>Component simter-vue-table</h2>
 
-<pre>
-// html
-&lt;st-table :columns="columns" :rows="rows" border="1"&gt;&lt;/st-table&gt;</pre>
+  <div class="block desc">
+    <a href="https://github.com/simter/simter-vue-table">Fork me on Github</a>. 
+    <a href="https://www.npmjs.com/package/simter-vue-table">Publish on npmjs</a>
+    <p>Define table tag by structured data.</p>
+  </div>
 
-  <h3>Example 1: Simple</h3>
-<pre>
-// vue data
-{
-  columns: [
-    { id: "id1", label: "Column1", width: "100px" },
-    { id: "id2", label: "Column2", width: "100px" },
-    { id: "id3", label: "Column3", width: "100px" }
-  ],
-  rows: [
-    { id1: "v11", id2: "v21", id3: "v31" },
-    { id1: "v12", id2: "v22", id3: "v32" },
-    { id1: "v13", id2: "v23", id3: "v33" }
-  ]
-}
+  <div class="block install">
+    <h2>Install :</h2>
+    <pre>
+// browser : (umd)
+&lt;script src="https://rawgit.com/simter/simter-vue-table/0.2.0/dist/simter-vue-table.min.js"&gt;&lt;/script&gt;
 
-// Expected result
-| Column1 | Column2 | Column3 |
-| v11     | v21     | v31     |
-| v12     | v22     | v32     |
-| v13     | v23     | v33     |
+// node :
+import table from 'simter-vue-table'</pre>
+  </div>
 
-// Actual result
-</pre>
-  <st-table id="demo1" :columns="columns" :rows="rows" border="1"></st-table>
+  <div class="block options">
+    <h2>Options :</h2>
+    <pre>
+| Name       | Description
+|------------|--------------------
+| columns    | Define table columns
+|   id       | The column's id, it's the key in the `rows` item
+|   label    | The column's visible text
+|   width    | The column's width
+|   children | Define how to group columns. The `id` and `width` will be ignored if define this property
+| rows       | The table's row data</pre>
+  </div>
+
+  <div class="block example">
+    <h2>Example 1 : Simple Columns</h2>
+    <st-table class="template" id="sample1" :columns="columns" :rows="rows" border="1"></st-table>
+    <pre>
+// Html :
+&lt;st-table id="sample" <b>:columns="columns" :rows="rows"</b>&gt;&lt;/st-table&gt;
+
+// Js :
+let table = window["simter-vue-table"].default  // browser
+import table from 'simter-vue-table'            // node
+
+new Vue({
+  el: "#sample",
+  data: {
+    <b>columns</b>: [
+      { id: "key1", label: "Sn", width: "50px" },
+      { id: "key2", label: "X1", width: "100px" },
+      { id: "key3", label: "X2", width: "50px" }
+    ],
+    <b>rows</b>: [
+      { key1: 1, key2: "v1-1", key3: "v2-1" },
+      { key1: 2, key2: "v1-2", key3: "v2-2" },
+      { key1: 3, key2: "v1-3" }
+    ]
+  },
+  components: {
+    <b>"st-table"</b>: table
+  }
+})</pre>
+  </div>
+
+  <div class="block example">
+    <h2>Example 2 : Group Columns</h2>
+    <st-table class="template" id="sample2" :columns="columns" :rows="rows" border="1"></st-table>
+    <pre>
+// Html :
+&lt;st-table id="sample" <b>:columns="columns" :rows="rows"</b>&gt;&lt;/st-table&gt;
+
+// Js :
+let table = window["simter-vue-table"].default  // browser
+import table from 'simter-vue-table'            // node
+
+new Vue({
+  el: "#sample",
+  data: {
+    <b>columns</b>: [
+      { id: "key1", label: "Sn", width: "50px" },
+      {
+        label: "X1",
+        children: [
+          { id: "key21", label: "X11", width: "60px" },
+          { id: "key22", label: "X12", width: "60px" }
+        ]
+      },
+      {
+        label: "X2",
+        children: [
+          { id: "key31", label: "X21", width: "60px" },
+          { id: "key32", label: "X22", width: "60px" }
+        ]
+      }
+    ],
+    <b>rows</b>: [
+      { key1: 1, key21: "v11-1", key22: "v12-1", key31: "v21-1", key32: "v22-1" },
+      { key1: 2, key21: "v11-2", key22: "v12-2", key31: "v21-2", key32: "v22-2" },
+      { key1: 3, key21: "v11-3", key22: "v12-3", key31: "v21-3" }
+    ]
+  },
+  components: {
+    <b>"st-table"</b>: table
+  }
+})</pre>
+  </div>
+
+  <div class="block example">
+    <h2>Example 3 : Complex Group Column</h2>
+    <st-table class="template" id="sample3" :columns="columns" :rows="rows" border="1"></st-table>
+    <pre>
+// Html :
+&lt;st-table id="sample" <b>:columns="columns" :rows="rows"</b>&gt;&lt;/st-table&gt;
+
+// Js :
+let table = window["simter-vue-table"].default  // browser
+import table from 'simter-vue-table'            // node
+
+new Vue({
+  el: "#sample",
+  data: {
+    <b>columns</b>: [
+      { id: "key1", label: "Sn", width: "50px" },
+      {
+        label: "X1",
+        children: [
+          { id: "key21", label: "X11", width: "60px" },
+          { id: "key22", label: "X12", width: "60px" }
+        ]
+      },
+      {
+        label: "X2",
+        children: [
+          { id: "key31", label: "X21", width: "60px" },
+          {
+            label: "X22",
+            children: [
+              { id: "key321", label: "X221", width: "60px" },
+              { id: "key322", label: "X222", width: "60px" }
+            ]
+          }
+        ]
+      }
+    ],
+    <b>rows</b>: [
+      { key1: 1, key21: "v11-1", key22: "v12-1", key31: "v21-1", key321: "v221-1", key322: "v222-1" },
+      { key1: 2, key21: "v11-2", key22: "v12-2", key31: "v21-2", key321: "v221-2" },
+      { key1: 3, key21: "v11-3", key22: "v12-3", key31: "v21-3", key321: "v221-3", key322: "v222-3" }
+    ]
+  },
+  components: {
+    <b>"st-table"</b>: table
+  }
+})</pre>
+  </div>
 
   <script src="./index.js"></script>
 </body>
