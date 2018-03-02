@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table v0.3.0
+* simter-vue-table v0.3.1
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */
