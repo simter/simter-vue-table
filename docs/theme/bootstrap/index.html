@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name=viewport content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
+  <title>st-table/bootstrap</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+  <style>
+    body { margin: 0.5rem; }
+    .block { margin-bottom: 2rem; }
+    .example, pre, form { margin: 0; padding: 0.5rem; border: .2rem solid #f7f7f9; }
+    .highlight { background-color: #f7f7f9; }
+    .link.highlight { max-width: 100%; }
+  </style>
+</head>
+
+<body>
+  <div class="block desc">
+    <h1>simter-vue-table demo</h1>
+    <p>Integrate with <a href="https://getbootstrap.com/docs/4.0/content/tables/">Bootstrap Tables theme</a>.</p>
+  </div>
+
+  <div class="block" id="sample1">
+      <div class="example">
+        <st-table :columns="columns" :rows="rows" :classes="classes"></st-table>
+      </div>
+      <form class="highlight">
+        <label>Options : (click # go to Bootstrap official document link)</label>
+        <ul>
+          <li>Header : 
+            <label><input type="radio" name="header" v-model="classes.thead" value="thead-light">Light (.thead-light)</label>
+            <label><input type="radio" name="header" v-model="classes.thead" value="thead-dark">Dark (.thead-dark)</label>
+            <label><input type="radio" name="header" v-model="classes.thead" value="">NotSet</label>
+            <a href="https://getbootstrap.com/docs/4.0/content/tables/#table-head-options" target="blank">#</a>
+          </li>
+          <li>
+            <label><input type="checkbox" v-model="classes.table" value="table-dark">Dark (.table-dark)</label>
+            <a href="https://getbootstrap.com/docs/4.0/content/tables/#examples" target="blank">#</a>
+          </li>
+          <li>
+            <label><input type="checkbox" v-model="classes.table" value="table-striped">Striped rows (.table-striped)</label>
+            <a href="https://getbootstrap.com/docs/4.0/content/tables/#striped-rows" target="blank">#</a>
+          </li>
+          <li>
+            <label><input type="checkbox" v-model="classes.table" value="table-bordered">Bordered table (.table-bordered)</label>
+            <a href="https://getbootstrap.com/docs/4.0/content/tables/#bordered-table" target="blank">#</a>
+          </li>
+          <li>
+            <label><input type="checkbox" v-model="classes.table" value="table-hover">Hoverable rows (.table-hover)</label>
+            <a href="https://getbootstrap.com/docs/4.0/content/tables/#hoverable-rows" target="blank">#</a>
+          </li>
+          <li>
+            <label><input type="checkbox" v-model="classes.table" value="table-sm">Small table (.table-sm)</label>
+            <a href="https://getbootstrap.com/docs/4.0/content/tables/#small-table" target="blank">#</a>
+          </li>
+        </ul>
+      </form>
+      <pre class="link highlight" style="overflow:visible">// CSS :
+&lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"&gt;
+
+// HTML :
+&lt;st-table :columns="columns" :rows="rows" <b>:classes="classes"</b>&gt;&lt;/st-table&gt;
+
+// JS :
+&lt;script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://rawgit.com/simter/simter-vue-table/0.3.0/dist/simter-vue-table.min.js"&gt;&lt;/script&gt;
+
+let table = window["simter-vue-table"].default;
+new Vue({
+  el: "#sample",
+  data: {
+    <b>classes:</b> {
+      table: ["table", "table-bordered", "table-hover"],
+      thead: "", 
+    },
+    columns: [
+      { id: "sn",     label: "#",     width: "40px" },
+      { id: "first",  label: "First", width: "100px" },
+      { id: "last",   label: "Last",  width: "100px" },
+      { id: "handle", label: "Handle" }
+    ],
+    rows: [
+      { sn: 1, first: "Mark",  last: "Otto",     handle: "@mdo" },
+      { sn: 2, first: "Jacob", last: "Thornton", handle: "@fat" },
+      { sn: 3, first: "Larry", last: "the Bird", handle: "@twitter" }
+    ]
+  },
+  components: {
+    "st-table": table
+  }
+});</pre>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>
+  <script src="../../../dist/simter-vue-table.min.js"></script>
+  <script src="./index.js"></script>
+</body>
+
+</html>
