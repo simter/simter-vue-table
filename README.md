@@ -1,9 +1,10 @@
 # Vue Component simter-vue-table
 
-Define table tag by structured data. 
-Demo or document is [here](https://simter.github.io/simter-vue-table).
+A [Vue] component used to generate HTML \<[table]\> element. 
 
-Core properties:
+[Demo](https://simter.github.io/simter-vue-table).
+
+Options:
 
 | Name                             | Description
 |----------------------------------|--------------------
@@ -255,3 +256,5 @@ Generated html:
 [rollup]: https://rollupjs.org
 [parcel]: https://parceljs.org
 [yarn]: https://yarnpkg.com
+[Vue]: https://vuejs.org
+[table]: https://developer.mozilla.org/docs/Web/HTML/Element/table
