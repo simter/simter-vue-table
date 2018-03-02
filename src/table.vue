@@ -1,8 +1,8 @@
 <template>
-<table>
+<table :class="$_classes.table">
   <colgroup is="st-colgroup" :columns="columns"></colgroup>
-  <thead is="st-thead" :columns="columns"></thead>
-  <tbody>
+  <thead is="st-thead" :columns="columns" :class="$_classes.thead"></thead>
+  <tbody :class="$_classes.tbody">
     <tr v-for="(row, index) in rows" :key="row.id || index">
       <td v-for="column in columnsLeaf" :key="column.id">{{row[column.id]}}</td>
     </tr>
@@ -14,13 +14,19 @@
 import colgroup from "simter-vue-colgroup";
 import thead from "simter-vue-thead";
 
-const defaultClasses = { table: "st-table" };
 const component = {
   replace: true,
   props: {
     columns: { type: Array, required: true },
     rows: {
       type: Array,
+      required: false,
+      default() {
+        return [];
+      }
+    },
+    classes: {
+      type: String | Object | Array,
       required: false,
       default() {
         return [];
@@ -34,6 +40,15 @@ const component = {
      */
     columnsLeaf() {
       return flatten(this.columns);
+    },
+    /**
+     * Convert String | Array to Object {table: ...}
+     */
+    $_classes() {
+      if (typeof this.classes === "string" || Array.isArray(this.classes))
+        return { table: this.classes };
+      else if (typeof this.classes === "object") return this.classes;
+      else return {};
     }
   },
   components: {
