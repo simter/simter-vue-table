@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table v0.2.0
+* simter-vue-table v0.3.0
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */
@@ -285,12 +285,19 @@ function deepClone(obj) {
   throw new Error("Unable to copy obj! Its type isn't supported.");
 }
 
-const component$2 = {render: function(){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('table',[_c("st-colgroup",{tag:"colgroup",attrs:{"columns":_vm.columns}}),_vm._v(" "),_c("st-thead",{tag:"thead",attrs:{"columns":_vm.columns}}),_vm._v(" "),_c('tbody',_vm._l((_vm.rows),function(row,index){return _c('tr',{key:row.id || index},_vm._l((_vm.columnsLeaf),function(column){return _c('td',{key:column.id},[_vm._v(_vm._s(row[column.id]))])}))}))])},staticRenderFns: [],
+const component$2 = {render: function(){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('table',{class:_vm.$_classes.table},[_c("st-colgroup",{tag:"colgroup",attrs:{"columns":_vm.columns}}),_vm._v(" "),_c("st-thead",{tag:"thead",class:_vm.$_classes.thead,attrs:{"columns":_vm.columns}}),_vm._v(" "),_c('tbody',{class:_vm.$_classes.tbody},_vm._l((_vm.rows),function(row,index){return _c('tr',{key:row.id || index},_vm._l((_vm.columnsLeaf),function(column){return _c('td',{key:column.id},[_vm._v(_vm._s(row[column.id]))])}))}))])},staticRenderFns: [],
   replace: true,
   props: {
     columns: { type: Array, required: true },
     rows: {
       type: Array,
+      required: false,
+      default() {
+        return [];
+      }
+    },
+    classes: {
+      type: String | Object | Array,
       required: false,
       default() {
         return [];
@@ -304,6 +311,15 @@ const component$2 = {render: function(){var _vm=this;var _h=_vm.$createElement;v
      */
     columnsLeaf() {
       return flatten$1(this.columns);
+    },
+    /**
+     * Convert String | Array to Object {table: ...}
+     */
+    $_classes() {
+      if (typeof this.classes === "string" || Array.isArray(this.classes))
+        return { table: this.classes };
+      else if (typeof this.classes === "object") return this.classes;
+      else return {};
     }
   },
   components: {
