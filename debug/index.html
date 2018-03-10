@@ -6,29 +6,46 @@
   <meta name=viewport content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
   <title>st-table debug</title>
   <style>
-    body { background-color: #000; color: #888 }
-    th { border: 1px solid #888 }
+    body { background-color: #000; color: #888; margin: 1em }
     a { color: #888}
-    h1 { color: #eee }
-    h2, b, .template { color: #bbb }
+    h2 { color: #eee; margin: 1rem 0 .1rem 0 }
+    p { margin: 0 0 1rem 0 }
+    h3, b, .template { color: #bbb }
     .block { border-bottom: 1px solid #333 }
+    iframe { display:block; width:100%; min-height:4em; border:none; border-bottom:1px solid #333}
   </style>
 </head>
 
 <body>
   <div class="block">
-    <h1>Component simter-vue-table</h1>
+    <h2>simter-vue-table</h2>
+    <p>A Vue component used to generate HTML &lt;table&gt; element.</p>
   </div>
-  <div class="block theme">
-    <h2>Integration :</h2>
-    <ul>
-      <li><a href="theme/bootstrap/index.html">Bootstrap</a></li>
-    </ul>
+  <div class="block iframe">
+    <iframe id="bootstrap" src="theme/bootstrap4/index.html" scrolling="no" onload="autoHeight(this)"></iframe>
   </div>
   <div id="sample1"></div>
   <div id="sample2"></div>
   <div id="sample3"></div>
   <script src="./index.js"></script>
+  <script>
+    const iframes = []
+    function autoHeight(iframe) {
+      iframes.push(iframe)
+    }
+    setInterval(() => {
+      iframes.forEach(iframe => {
+        const ibody = iframe.contentWindow.document.body;
+        const cs = getComputedStyle(ibody);
+        const innerHeight = ibody.offsetHeight + parseInt(cs.marginTop) + parseInt(cs.marginBottom) + "px";
+        const originHeight = iframe.style.height;
+        if (originHeight !== innerHeight) {
+          console.log("Auto height '%s' iframe to %s (originHeight=%s)", iframe.id || "NO_ID", innerHeight, originHeight);
+          iframe.style.height = innerHeight;
+        }
+      })
+    }, 200)
+  </script>
 </body>
 
 </html>
