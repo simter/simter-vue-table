@@ -1,5 +1,5 @@
 <template>
-<form :class="'bg-' + ui.theme" style="padding:1em">
+<form :class="ui.theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'" style="padding:1em">
   <div class="title">
     <h3><a href="https://getbootstrap.com/docs/4.0/content/tables/">Bootstrap 4 UI</a>
     <div class="btn-group btn-group-sm" style="float:right">
@@ -17,52 +17,42 @@
   </div>
   <div class="options">
     <label>Bootstrap Options: (click § go to Bootstrap official document link)</label>
-    <ul>
+    <ul style="list-style: none; padding: 0">
       <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#bordered-table" target="blank">§</a>
-        <div class="btn-group btn-group-sm">
-          <label :class="{'btn btn-secondary': true, active: ui.borderedTable}">
-            <input type="checkbox" v-model="ui.borderedTable"> Bordered table
-          </label>
-        </div>
+        <label>
+          <input type="checkbox" v-model="ui.borderedTable"> Bordered table
+        </label>
       </li>
       <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#hoverable-rows" target="blank">§</a>
-        <div class="btn-group btn-group-sm">
-          <label :class="{'btn btn-secondary': true, active: ui.hoverableRows}">
-            <input type="checkbox" v-model="ui.hoverableRows"> Hoverable rows
-          </label>
-        </div>
+        <label>
+          <input type="checkbox" v-model="ui.hoverableRows"> Hoverable rows
+        </label>
       </li>
       <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#striped-rows" target="blank">§</a>
-        <div class="btn-group btn-group-sm">
-          <label :class="{'btn btn-secondary': true, active: ui.stripedRows}">
-            <input type="checkbox" v-model="ui.stripedRows"> Striped rows
-          </label>
-        </div>
+        <label>
+          <input type="checkbox" v-model="ui.stripedRows"> Striped rows
+        </label>
       </li>
       <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#small-table" target="blank">§</a>
-        <div class="btn-group btn-group-sm">
-          <label :class="{'btn btn-secondary': true, active: ui.smallTable}">
-            <input type="checkbox" v-model="ui.smallTable"> Small table
-          </label>
-        </div>
+        <label>
+          <input type="checkbox" v-model="ui.smallTable"> Small table
+        </label>
       </li>
       <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#table-head-options" target="blank">§</a>
-        <div class="btn-group btn-group-sm">
-          <label :class="{'btn btn-secondary': true, active: ui.theme === 'dark'}">
+          <label>
             <input type="radio" v-model="ui.tableHeader" value=""> Not Set
           </label>
-          <label :class="{'btn btn-secondary': true, active: ui.theme === 'light'}">
+          <label>
             <input type="radio" v-model="ui.tableHeader" value="thead-dark"> Dark Header
           </label>
-          <label :class="{'btn btn-secondary': true, active: ui.tableHeader === 'light'}">
+          <label>
             <input type="radio" v-model="ui.tableHeader" value="thead-light"> Light Header
           </label>
-        </div>
       </li>
     </ul>
   </div>
