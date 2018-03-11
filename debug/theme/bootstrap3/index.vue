@@ -8,7 +8,7 @@
   </div>
   <div class="options">
     <span>Bootstrap Options: (click § go to Bootstrap official document link)</span>
-    <ul style="list-style: none; padding: 0">
+    <ul style="list-style: none; padding: 0; margin: 0">
       <li>
         <a href="https://getbootstrap.com/docs/3.3/css/#tables-bordered" target="blank">§</a>
         <label class="checkbox-inline">

@@ -17,7 +17,7 @@
   </div>
   <div class="options">
     <label>Bootstrap Options: (click § go to Bootstrap official document link)</label>
-    <ul style="list-style: none; padding: 0">
+    <ul style="list-style: none; padding: 0; margin: 0">
       <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#bordered-table" target="blank">§</a>
         <label>
