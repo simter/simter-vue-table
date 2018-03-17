@@ -1,16 +1,18 @@
 <template>
 <form :class="ui.theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'" style="padding:1em">
   <div class="title">
-    <h3><a href="https://getbootstrap.com/docs/4.0/content/tables/">Bootstrap 4 UI</a>
-    <div class="btn-group btn-group-sm" style="float:right">
-      <label :class="{'btn btn-secondary': true, active: ui.theme === 'dark'}">
-        <input type="radio" v-model="ui.theme" value="dark"> Dark
-      </label>
-      <label :class="{'btn btn-secondary': true, active: ui.theme === 'light'}">
-        <input type="radio" v-model="ui.theme" value="light"> Light
-      </label>
-    </div>
-    </h3>
+    <h2>
+      <a href="https://getbootstrap.com/docs/4.0/content/tables/" class="text-primary">Bootstrap UI 4.x</a>
+      <span class="text-muted" style="font-size: 50%">Integration</span>
+      <div class="btn-group btn-group-sm" style="float:right">
+        <label :class="{'btn btn-secondary': true, active: ui.theme === 'dark'}">
+          <input type="radio" v-model="ui.theme" value="dark"> Dark
+        </label>
+        <label :class="{'btn btn-secondary': true, active: ui.theme === 'light'}">
+          <input type="radio" v-model="ui.theme" value="light"> Light
+        </label>
+      </div>
+    </h2>
   </div>
   <div class="template">
     <st-table :columns="columns" :rows="rows" :classes="classes"></st-table>

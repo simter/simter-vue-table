@@ -1,12 +1,14 @@
 <template>
 <form :class="'ui form'" style="padding:1em">
   <div class="title">
-    <h1><a href="https://semantic-ui.com/collections/table.html">Semantic UI 2.x</a>
-    <div class="ui toggle checkbox" style="float:right">
-      <input type="checkbox" v-model="ui.inverted">
-      <label>Inverted</label>
-    </div>
-    </h1>
+    <h2>
+      <a href="https://semantic-ui.com/collections/table.html">Semantic UI 2.x</a>
+      <span style="font-size: 50%">Integration</span>
+      <div class="ui toggle checkbox" style="float:right">
+        <input type="checkbox" v-model="ui.inverted">
+        <label>Inverted</label>
+      </div>
+    </h2>
   </div>
   <div class="template">
     <st-table :columns="columns" :rows="rows" :classes="classes"></st-table>
@@ -130,7 +132,7 @@ export default {
   data() {
     return {
       ui: {
-        inverted: false,
+        inverted: true,
         tableHeader: "",
         celledTable: true,
         selectableRow: true,

@@ -1,7 +1,10 @@
 <template>
 <form style="padding:1em">
   <div class="title">
-    <h3 style="margin-top: 0"><a href="https://getbootstrap.com/docs/3.3/css/#tables">Bootstrap 3 UI</a></h3>
+    <h2 style="margin-top: 0">
+      <a href="https://getbootstrap.com/docs/3.3/css/#tables" class="text-primary">Bootstrap UI 3.x</a>
+      <span class="text-muted" style="font-size: 50%">Integration</span>
+    </h2>
   </div>
   <div class="template">
     <st-table :columns="columns" :rows="rows" :classes="classes"></st-table>
