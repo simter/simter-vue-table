@@ -4,9 +4,10 @@
     <h2>
       <a href="https://semantic-ui.com/collections/table.html">Semantic UI 2.x</a>
       <span style="font-size: 50%">Integration</span>
-      <div class="ui toggle checkbox" style="float:right">
-        <input type="checkbox" v-model="ui.inverted">
-        <label>Inverted</label>
+      <div class="compact" style="float: right; font-size: 60%">Theme :
+        <select style="padding: 0.2em; display: inline-block; width: auto" v-model="ui.theme" @change="changeTheme">
+          <option v-for="theme in ui.themes" v-bind:key="theme.id">{{ theme.id }}</option>
+        </select>
       </div>
     </h2>
   </div>
@@ -15,6 +16,12 @@
   </div>
   <div class="grouped fields">
     <label>Options :</label>
+    <div class="field">
+      <div class="ui checkbox">
+        <input type="checkbox" v-model="ui.inverted">
+        <label>Inverted</label>
+      </div>
+    </div>
     <div class="field">
       <div class="ui checkbox">
         <input type="checkbox" v-model="ui.celledTable">
@@ -132,7 +139,7 @@ export default {
   data() {
     return {
       ui: {
-        inverted: true,
+        inverted: false,
         tableHeader: "",
         celledTable: true,
         selectableRow: true,
@@ -152,7 +159,30 @@ export default {
         definitionTable: false,
         structuredTable: false,
         unstackableTable: false,
-        selectableCell: false
+        selectableCell: false,
+
+        theme: "Cyborg",
+        themes: [
+          {id: "Default", href: "https://cdn.jsdelivr.net/npm/semantic-ui@2.3.0/dist/semantic.min.css"},
+          {id: "Darkly", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.darkly.min.css"},
+          {id: "Cyborg", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.cyborg.min.css"},
+          {id: "Slate", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.slate.min.css"},
+          {id: "Solar", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.solar.min.css"},
+          {id: "Superhero", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.superhero.min.css"},
+
+          {id: "Cerulean", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.Cerulean.min.css"},
+          {id: "Cosmo", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.Cosmo.min.css"},
+          {id: "Flatly", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.flatly.min.css"},
+          {id: "Journal", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.journal.min.css"},
+          {id: "Lumen", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.lumen.min.css"},
+          {id: "Paper", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.paper.min.css"},
+          {id: "Readable", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.readable.min.css"},
+          {id: "Sandstone", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.sandstone.min.css"},
+          {id: "Simplex", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.simplex.min.css"},
+          {id: "Spacelab", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.spacelab.min.css"},
+          {id: "United", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.united.min.css"},
+          {id: "Yeti", href: "https://cdn.jsdelivr.net/npm/semantic-ui-forest-themes@1.0.3/semantic.yeti.min.css"}
+        ]
       },
       columns: [
         { id: "sn", label: "#", width: "40px" },
@@ -197,6 +227,17 @@ export default {
       if (this.ui.unstackableTable) cs.table.push("unstackable");
       //if (this.ui.selectableCell) cs.table.push("selectable");
       return cs;
+    }
+  },
+  methods: {
+    changeTheme(){
+      const href = this.getThemeHrefById(this.ui.theme)
+      //console.log("%s-%s", this.ui.theme, href)
+      document.getElementById('theme').href = href
+    },
+    getThemeHrefById(themeId){
+      for (const theme of this.ui.themes)
+        if (theme.id === themeId) return theme.href
     }
   }
 };
