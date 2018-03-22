@@ -4,6 +4,12 @@
     <h2 style="margin-top: 0">
       <a href="https://getbootstrap.com/docs/3.3/css/#tables" class="text-primary">Bootstrap UI 3.x</a>
       <span class="text-muted" style="font-size: 50%">Integration</span>
+      <div class="text-muted" style="float: right; font-size: 60%">Theme :
+        <select class="form-control" style="padding: 0.2em; display: inline-block; width: auto"
+          v-model="ui.theme" @change="changeTheme">
+          <option v-for="(value, key) in ui.themes" v-bind:key="key">{{ key }}</option>
+        </select>
+      </div>
     </h2>
   </div>
   <div class="template">
@@ -50,7 +56,13 @@ export default {
         borderedTable: true,
         hoverableRows: true,
         stripedRows: false,
-        smallTable: false
+        smallTable: false,
+
+        theme: "Cyborg",
+        themes: {
+          "Default": "https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css",
+          "Cyborg": "https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cyborg/bootstrap.min.css"
+        }
       },
       columns: [
         { id: "sn", label: "#", width: "40px" },
@@ -80,6 +92,22 @@ export default {
       if (this.ui.stripedRows) cs.table.push("table-striped");
       if (this.ui.smallTable) cs.table.push("table-sm table-condensed");
       return cs;
+    }
+  },
+  mounted(){
+    // get all bootswatch themes
+    fetch("https://bootswatch.com/api/4.json")
+    .then(response => response.json())
+    .then(result => {
+      console.log("find %s themes from https://bootswatch.com/api/3.json", result.themes.length);
+      result.themes.forEach(theme => {
+        if(!this.ui.themes.hasOwnProperty(theme.name)) this.$set(this.ui.themes, theme.name, theme.cssCdn);
+      });
+    })
+  },
+  methods: {
+    changeTheme(){
+      document.getElementById('theme').href = this.ui.themes[this.ui.theme];
     }
   }
 };
