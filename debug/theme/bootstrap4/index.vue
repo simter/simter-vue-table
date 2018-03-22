@@ -1,16 +1,14 @@
 <template>
-<form :class="ui.theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'" style="padding:1em">
+<form style="padding:1em">
   <div class="title">
     <h2>
       <a href="https://getbootstrap.com/docs/4.0/content/tables/" class="text-primary">Bootstrap UI 4.x</a>
       <span class="text-muted" style="font-size: 50%">Integration</span>
-      <div class="btn-group btn-group-sm" style="float:right">
-        <label :class="{'btn btn-secondary': true, active: ui.theme === 'dark'}">
-          <input type="radio" v-model="ui.theme" value="dark"> Dark
-        </label>
-        <label :class="{'btn btn-secondary': true, active: ui.theme === 'light'}">
-          <input type="radio" v-model="ui.theme" value="light"> Light
-        </label>
+      <div class="text-muted" style="float: right; font-size: 60%">Theme :
+        <select class="form-control" style="padding: 0.2em; display: inline-block; width: auto"
+          v-model="ui.theme" @change="changeTheme">
+          <option v-for="(value, key) in ui.themes" v-bind:key="key">{{ key }}</option>
+        </select>
       </div>
     </h2>
   </div>
@@ -45,6 +43,12 @@
         </label>
       </li>
       <li>
+        <a href="https://getbootstrap.com/docs/4.0/content/tables/#examples" target="blank">§</a>
+        <label>
+          <input type="checkbox" v-model="ui.darkTable"> Dark table
+        </label>
+      </li>
+      <li>
         <a href="https://getbootstrap.com/docs/4.0/content/tables/#table-head-options" target="blank">§</a>
           <label>
             <input type="radio" v-model="ui.tableHeader" value=""> Not Set
@@ -67,12 +71,18 @@ export default {
   data() {
     return {
       ui: {
-        theme: "dark",
         tableHeader: "",
         borderedTable: true,
         hoverableRows: true,
         stripedRows: false,
-        smallTable: false
+        smallTable: false,
+        darkTable: false,
+
+        theme: "Cyborg",
+        themes: {
+          "Default": "https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css",
+          "Cyborg": "https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0/cyborg/bootstrap.min.css"
+        }
       },
       columns: [
         { id: "sn", label: "#", width: "40px" },
@@ -97,13 +107,29 @@ export default {
         thead: ""
       };
 
-      cs.table.push("table-" + this.ui.theme);
       cs.thead = this.ui.tableHeader;
       if (this.ui.borderedTable) cs.table.push("table-bordered");
       if (this.ui.hoverableRows) cs.table.push("table-hover");
       if (this.ui.stripedRows) cs.table.push("table-striped");
       if (this.ui.smallTable) cs.table.push("table-sm");
+      if (this.ui.darkTable) cs.table.push("table-dark");
       return cs;
+    }
+  },
+  mounted(){
+    // get all bootswatch themes
+    fetch("https://bootswatch.com/api/4.json")
+    .then(response => response.json())
+    .then(result => {
+      console.log("find %s themes from https://bootswatch.com/api/4.json", result.themes.length);
+      result.themes.forEach(theme => {
+        if(!this.ui.themes.hasOwnProperty(theme.name)) this.$set(this.ui.themes, theme.name, theme.cssCdn);
+      });
+    })
+  },
+  methods: {
+    changeTheme(){
+      document.getElementById('theme').href = this.ui.themes[this.ui.theme];
     }
   }
 };
