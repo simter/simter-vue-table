@@ -13,14 +13,14 @@
     </h2>
   </div>
   <div class="template">
-    <st-table :columns="columns" :rows="rows" :classes="classes"></st-table>
+    <st-table :columns="columns" :rows="rows" :classes="classes" :styles="styles"></st-table>
   </div>
-  <!-- <div class="options" style="border: none">
+  <div class="options" style="border: none">
     <label>Options:</label>
     <ul style="list-style: none; padding: 0; margin: 0">
       <li><label><input type="checkbox" v-model="ui.borderedTable"> Bordered table</label></li>
     </ul>
-  </div> -->
+  </div>
 </form>
 </template>
 
@@ -30,7 +30,6 @@ export default {
   data() {
     return {
       ui: {
-        tableHeader: "",
         borderedTable: true,
 
         theme: "dark-hive",
@@ -59,14 +58,42 @@ export default {
   },
   computed: {
     classes() {
-      const cs = {
-        table: [],
-        thead: ""
+      const t = {
+        table: "table",
+        thead: {
+          thead: "thead",
+          tr: "tr",
+          th: "th"
+        },
+        tbody: "tbody",
+        tr: "tr",
+        td: "td"
       };
 
-      cs.thead = this.ui.tableHeader;
+      if (this.ui.borderedTable) {
+        t.thead.tr = t.tr += " ui-widget-content";
+      }
 
-      return cs;
+      return t;
+    },
+    styles() {
+      const t = {
+        table: {
+          'border-collapse': 'collapse',
+          'table-layout': 'fixed'
+        },
+        thead: {}
+      };
+
+      if (this.ui.borderedTable) {
+        t.thead.th = t.td = {
+          'borderWidth': '1px',
+          'border-color': 'inherit',
+          'border-style': 'inherit',
+          'padding': '0.4em'
+        };
+      }
+      return t;
     }
   },
   mounted(){
