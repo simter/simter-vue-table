@@ -1,10 +1,19 @@
 <template>
-<table :class="$_classes.table">
+<table :class="$_classes.table" :style="$_styles.table">
   <colgroup is="st-colgroup" :columns="columns"></colgroup>
-  <thead is="st-thead" :columns="columns" :class="$_classes.thead"></thead>
-  <tbody :class="$_classes.tbody">
-    <tr v-for="(row, index) in rows" :key="row.id || index">
-      <td v-for="column in columnsLeaf" :key="column.id">{{row[column.id]}}</td>
+  <thead v-if="thead" is="st-thead"
+         :columns="columns"
+         :classes="$_classes.thead"
+         :styles="$_styles.thead"></thead>
+  <tbody :class="$_classes.tbody" :style="$_styles.tbody">
+    <tr v-for="(row, index) in rows"
+        :key="row.id || index"
+        :class="$_classes.tr"
+        :style="$_styles.tr">
+      <td v-for="column in columnsLeaf"
+          :key="column.id"
+          :class="column.class || $_classes.td"
+          :style="column.style || $_styles.td">{{row[column.id]}}</td>
     </tr>
   </tbody>
 </table>
@@ -17,6 +26,7 @@ import thead from "simter-vue-thead";
 const component = {
   replace: true,
   props: {
+    thead: { type: Boolean, required: false, default() { return true } },
     columns: { type: Array, required: true },
     rows: {
       type: Array,
@@ -29,7 +39,14 @@ const component = {
       type: String | Object | Array,
       required: false,
       default() {
-        return [];
+        return {};
+      }
+    },
+    styles: {
+      type: String | Object | Array,
+      required: false,
+      default() {
+        return {};
       }
     }
   },
@@ -48,6 +65,15 @@ const component = {
       if (typeof this.classes === "string" || Array.isArray(this.classes))
         return { table: this.classes };
       else if (typeof this.classes === "object") return this.classes;
+      else return {};
+    },
+    /**
+     * Convert String | Array to Object {table: ...}
+     */
+    $_styles() {
+      if (typeof this.styles === "string" || Array.isArray(this.styles))
+        return { table: this.styles };
+      else if (typeof this.styles === "object") return this.styles;
       else return {};
     }
   },
