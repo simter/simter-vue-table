@@ -27,6 +27,7 @@
     "test": "ava",
     "clean": "rm -rf dist/* temp/*",
     "build": "npm run clean && npm test && rollup -c && npm run min-js",
+    "buildTo": "rollup -c && npm run min-js && cp dist/simter-vue-table.js /to-path/simter-vue-table.js",
     "min-js": "uglifyjs --comments /^!/ dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url",
     "prepublishOnly": "npm run build"
   },
