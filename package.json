@@ -48,7 +48,8 @@
     "stylus": "~0.54.5",
     "uglify-es": "~3.3.9",
     "vue": "~2.5.17",
-    "vue-template-compiler": "~2.5.17"
+    "vue-template-compiler": "~2.5.17",
+    "vue-hot-reload-api": "^2.3.1"
   },
   "ava": {
     "babel": "inherit",
