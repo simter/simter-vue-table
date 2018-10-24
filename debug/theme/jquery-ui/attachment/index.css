@@ -1,0 +1,64 @@
+body {
+  padding: 0;
+  margin: 0
+}
+
+.options {
+  margin-top: 1em
+}
+
+.ui-widget-content {
+  background-image: none;
+}
+
+.st-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.st-table .st-header, .st-table .st-row {
+  border-width: 1px;
+  /* 0 to no outer border*/
+}
+
+.st-header .st-cell {
+  font-weight: normal;
+  border-width: 0 1px 0 1px;
+  border-color: inherit;
+  border-style: inherit;
+  padding: 0.4em;
+}
+
+.st-row .st-cell {
+  font-weight: normal;
+  border-width: 1px 1px 0 1px;
+  border-color: inherit;
+  border-style: inherit;
+  padding: 0.25em;
+}
+
+.st-cell:first-child {
+  border-left-width: 0;
+}
+
+.st-cell.number-editor input {
+  text-align: right;
+}
+
+.st-row .st-cell.text-editor input, .st-row .st-cell.number-editor input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.25em;
+}
+
+.monospace {
+  font-family: Menlo, "宋体", sans-serif;
+}
+
+.align-center {
+  text-align: center
+}
+
+.align-right {
+  text-align: right
+}
