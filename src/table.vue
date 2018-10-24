@@ -1,19 +1,26 @@
 <template>
-<table :class="$_classes.table" :style="$_styles.table">
+<table :class="rootClass" :style="styles.root">
   <colgroup is="st-colgroup" :columns="columns"></colgroup>
   <thead v-if="thead" is="st-thead"
          :columns="columns"
-         :classes="$_classes.thead"
-         :styles="$_styles.thead"></thead>
-  <tbody :class="$_classes.tbody" :style="$_styles.tbody">
-    <tr v-for="(row, index) in rows"
-        :key="row.id || index"
-        :class="$_classes.tr"
-        :style="$_styles.tr">
-      <td v-for="column in columnsLeaf"
-          :key="column.id"
-          :class="column.class || $_classes.td"
-          :style="column.style || $_styles.td">{{row[column.id]}}</td>
+         :classes="classes.thead"
+         :styles="styles.thead"></thead>
+  <tbody :class="classes.tbody" :style="styles.tbody">
+    <tr v-for="(row, rowIndex) in rows"
+        :key="row.id || rowIndex"
+        :class="classes.row"
+        :style="styles.row">
+      <component v-for="(column, columnIndex) in columnsLeaf"
+        :is="(column.cell && column.cell.type) || defaultCellType"
+        :key="column.id"
+        :class="classes.cell || defaultCellClass"
+        :style="styles.cell"
+        :column-index="columnIndex"
+        :column="column"
+        :row-index="rowIndex"
+        :row="row"
+        @cell-change="reemitCellChangeEvent">
+      </component>
     </tr>
   </tbody>
 </table>
@@ -23,10 +30,23 @@
 import colgroup from "simter-vue-colgroup";
 import thead from "simter-vue-thead";
 
+// inner cell components
+import cellText from "./cell/text.vue";
+import cellHtml from "./cell/html.vue";
+import cellRowPicker from "./cell/row-picker.vue";
+import cellTextEditor from "./cell/text-editor.vue";
+import cellNumberEditor from "./cell/number-editor.vue";
+const cells = {
+  "st-cell-text": cellText,
+  "st-cell-html": cellHtml,
+  "st-cell-row-picker": cellRowPicker,
+  "st-cell-text-editor": cellTextEditor,
+  "st-cell-number-editor": cellNumberEditor
+};
+
 const component = {
-  replace: true,
   props: {
-    thead: { type: Boolean, required: false, default() { return true } },
+    thead: { type: Boolean, required: false, default: true },
     columns: { type: Array, required: true },
     rows: {
       type: Array,
@@ -36,19 +56,23 @@ const component = {
       }
     },
     classes: {
-      type: String | Object | Array,
+      type: Object,
       required: false,
       default() {
         return {};
       }
     },
     styles: {
-      type: String | Object | Array,
+      type: Object,
       required: false,
       default() {
         return {};
       }
-    }
+    },
+    defaultCellType: { type: String, required: false, default: "st-cell-text" }
+  },
+  data() {
+    return { defaultCellClass: "st-cell" };
   },
   computed: {
     /**
@@ -58,28 +82,23 @@ const component = {
     columnsLeaf() {
       return flatten(this.columns);
     },
-    /**
-     * Convert String | Array to Object {table: ...}
-     */
-    $_classes() {
-      if (typeof this.classes === "string" || Array.isArray(this.classes))
-        return { table: this.classes };
-      else if (typeof this.classes === "object") return this.classes;
-      else return {};
-    },
-    /**
-     * Convert String | Array to Object {table: ...}
-     */
-    $_styles() {
-      if (typeof this.styles === "string" || Array.isArray(this.styles))
-        return { table: this.styles };
-      else if (typeof this.styles === "object") return this.styles;
-      else return {};
+    /** Use user define class by `:class`, otherwise use default class. */
+    rootClass() {
+      return "class" in this.$vnode.data ? "" : "st-table";
     }
   },
   components: {
     "st-colgroup": colgroup,
-    "st-thead": thead
+    "st-thead": thead,
+    ...cells
+  },
+  methods: {
+    reemitCellChangeEvent($event) {
+      // console.log("in table: newValue=%s, oldValue=%s", $event.newValue, $event.oldValue);
+
+      // reemit cell-change event
+      this.$emit("cell-change", $event);
+    }
   }
 };
 
