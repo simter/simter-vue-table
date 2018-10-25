@@ -7,45 +7,52 @@ body {
   margin-top: 1em
 }
 
-.ui-widget-content {
-  background-image: none;
-}
-
 .st-table {
   border-collapse: collapse;
   table-layout: fixed;
 }
 
-.st-table .st-header, .st-table .st-row {
+.st-table .ui-widget-content {
+  background-image: none;
+}
+
+.st-table .st-header, .st-table .st-row, .st-table .st-group-row {
   border-width: 1px;
   /* 0 to no outer border*/
 }
 
-.st-header .st-cell {
+.st-cell, .st-group-cell {
   font-weight: normal;
-  border-width: 0 1px 0 1px;
-  border-color: inherit;
-  border-style: inherit;
-  padding: 0.4em;
-}
-
-.st-row .st-cell {
-  font-weight: normal;
-  border-width: 1px 1px 0 1px;
   border-color: inherit;
   border-style: inherit;
   padding: 0.25em;
 }
 
-.st-cell:first-child {
+.st-header .st-cell {
+  border-width: 0 1px 0 1px;
+}
+
+.st-row .st-cell {
+  border-width: 1px 1px 0 1px;
+}
+
+.st-group-row .st-group-cell {
+  border-width: 1px 1px 0 1px;
+}
+
+.st-cell:first-child, .st-group-cell:first-child {
   border-left-width: 0;
 }
 
-.st-cell.number-editor input {
+.st-cell:last-child, .st-group-cell:last-child {
+  border-right-width: 0;
+}
+
+.st-cell .number-editor {
   text-align: right;
 }
 
-.st-row .st-cell.text-editor input, .st-row .st-cell.number-editor input {
+.st-row .st-cell .text-editor, .st-row .st-cell .number-editor  {
   box-sizing: border-box;
   width: 100%;
   padding: 0.25em;
