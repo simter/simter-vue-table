@@ -1,27 +1,49 @@
 <template>
-<table :class="rootClass" :style="styles.root">
+<table :class="$_rootClass" :style="styles.root">
   <colgroup is="st-colgroup" :columns="columns"></colgroup>
-  <thead v-if="thead" is="st-thead"
+  <thead v-if="!withoutThead" is="st-thead"
          :columns="columns"
          :classes="classes.thead"
          :styles="styles.thead"></thead>
   <tbody :class="classes.tbody" :style="styles.tbody">
-    <tr v-for="(row, rowIndex) in rows"
-        :key="row.id || rowIndex"
-        :class="classes.row"
-        :style="styles.row">
-      <component v-for="(column, columnIndex) in columnsLeaf"
-        :is="(column.cell && column.cell.type) || defaultCellType"
-        :key="column.id"
-        :class="classes.cell || defaultCellClass"
-        :style="styles.cell"
-        :column-index="columnIndex"
-        :column="column"
-        :row-index="rowIndex"
-        :row="row"
-        @cell-change="reemitCellChangeEvent">
-      </component>
-    </tr>
+    <template v-if="group" v-for="(rows, groupKey) in $_groupedRows">
+      <!-- generate group row -->
+      <tr :key="groupKey" :class="classes.groupRow || 'st-group-row'"
+        :style="styles.groupRow">
+        <td :class="classes.groupCell || 'st-group-cell'"
+          :style="styles.groupCell"
+          :colspan="$_columnsLeaf.length"
+          >{{groupKey}}</td>
+      </tr>
+      <!-- generate group's data row -->
+      <tr v-for="(row, rowIndex) in rows"
+        :key="groupKey + (row[idProp] || rowIndex)"
+        :class="classes.row || 'st-row'" :style="styles.row">
+        <td v-for="(column, columnIndex) in $_columnsLeaf"
+          :key="column.id"
+          :class="classes.cell || 'st-cell'" :style="styles.cell">
+          <component :is="$_getCellComponent(column)"
+            :column-index="columnIndex" :column="column"
+            :row-index="rowIndex" :row="row"
+            @cell-change="reemitCellChangeEvent">
+          </component>
+        </td>
+      </tr>
+    </template>
+    <template v-else>
+      <!-- generate data row -->
+      <tr v-for="(row, rowIndex) in rows" :key="row[idProp] || rowIndex"
+          :class="classes.row || 'st-row'" :style="styles.row">
+        <td v-for="(column, columnIndex) in $_columnsLeaf" :key="column.id"
+            :class="classes.cell || 'st-cell'" :style="styles.cell">
+          <component :is="$_getCellComponent(column)"
+            :column-index="columnIndex" :column="column"
+            :row-index="rowIndex" :row="row"
+            @cell-change="reemitCellChangeEvent">
+          </component>
+        </td>
+      </tr>
+    </template>
   </tbody>
 </table>
 </template>
@@ -44,9 +66,34 @@ const cells = {
   "st-cell-number-editor": cellNumberEditor
 };
 
+/**
+ * var rows = [{g: 'b', id: 22}, {g: 'a', id: 11}, {g: 'b', id: 21}, {id: 52}, {id: 50}]
+ * groupBy(rows, 'g', ['c', 'd']) :
+ * {
+ *   b: [{g: 'b', id: 22}, {g: 'b', id: 21}],
+ *   a: [{g: 'a', id: 11}],
+ *   undefined: [{id: 52}, {id: 50}],
+ *   c: [],
+ *   d: []
+ * }
+ */
+var groupByRows = function(rows, groupKey, defaultGroups) {
+  const groupRows = rows.reduce(function(rv, row) {
+    (rv[row[groupKey]] = rv[row[groupKey]] || []).push(row);
+    return rv;
+  }, {});
+
+  if (defaultGroups)
+    defaultGroups
+      .filter(g => !(g in groupRows))
+      .forEach(g => (groupRows[g] = []));
+  return groupRows;
+};
+
 const component = {
   props: {
-    thead: { type: Boolean, required: false, default: true },
+    idProp: { type: String, required: false, default: 'id' },
+    withoutThead: { type: Boolean, required: false, default: false },
     columns: { type: Array, required: true },
     rows: {
       type: Array,
@@ -69,7 +116,7 @@ const component = {
         return {};
       }
     },
-    defaultCellType: { type: String, required: false, default: "st-cell-text" }
+    group: { type: [String, Object], required: false }
   },
   data() {
     return { defaultCellClass: "st-cell" };
@@ -79,12 +126,21 @@ const component = {
      * The result of function call flatten(this.columns).
      * It gather all columns leaf to return.
      */
-    columnsLeaf() {
+    $_columnsLeaf() {
       return flatten(this.columns);
     },
     /** Use user define class by `:class`, otherwise use default class. */
-    rootClass() {
+    $_rootClass() {
       return "class" in this.$vnode.data ? "" : "st-table";
+    },
+    /**  */
+    $_group() {
+      return typeof this.group !== "object" ? { prop: this.group } : this.group;
+    },
+    /**  */
+    $_groupedRows() {
+      if (!this.$_group) return null;
+      return groupByRows(this.rows, this.$_group.prop, this.$_group.names);
     }
   },
   components: {
@@ -93,6 +149,22 @@ const component = {
     ...cells
   },
   methods: {
+    $_getCellComponent(column) {
+      if (!column.cell) {
+        // global cell
+        return (
+          (typeof this.cell === "object" ? this.cell.component : this.cell) ||
+          "st-cell-text"
+        );
+      } else {
+        // column cell
+        return (
+          (typeof column.cell === "object"
+            ? column.cell.component
+            : column.cell) || "st-cell-text"
+        );
+      }
+    },
     reemitCellChangeEvent($event) {
       // console.log("in table: newValue=%s, oldValue=%s", $event.newValue, $event.oldValue);
 

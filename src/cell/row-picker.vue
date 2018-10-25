@@ -1,11 +1,11 @@
 <template>
-<td :class="classes.root || ['row-picker', cfg.class]" :style="styles.root">
-  <label :class="classes.label" :style="styles.label">
-    <input type="checkbox" v-model="picked" :class="classes.input" :style="styles.input">
-    <span v-if="cfg.showContent" :class="classes.span" :style="styles.span"
-      >{{content}}</span>
-  </label>
-</td>
+<label :class="['row-picker', classes.label]" :style="styles.label">
+  <input type="checkbox" v-model="picked" :class="classes.input" :style="styles.input">
+  <span v-if="cfg.showRowNumber" :class="classes.span" :style="styles.span"
+    >{{rowIndex + 1}}</span>
+  <span v-if="cfg.showContent" :class="classes.span" :style="styles.span"
+    >{{content}}</span>
+</label>
 </template>
 
 <script>

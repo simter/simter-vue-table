@@ -1,5 +1,5 @@
 <template>
-<td :class="classes.root || ['text', cfg.class]" :style="styles.root">{{content}}</td>
+<span>{{content}}</span>
 </template>
 
 <script>

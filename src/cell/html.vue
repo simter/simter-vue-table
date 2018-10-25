@@ -1,5 +1,5 @@
 <template>
-<td :class="classes.root || ['html', cfg.class]" :style="styles.root" v-html="content"></td>
+<div v-html="content"></div>
 </template>
 
 <script>

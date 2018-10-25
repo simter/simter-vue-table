@@ -1,10 +1,10 @@
 <template>
-<td :class="classes.root || ['text-editor', cfg.class]" :style="styles.root">
-  <input type="text" :value="value" :class="classes.input" :style="styles.input"
-    @keyup.enter="acceptChange(column.id, $event.target.value, value)"
-    @keyup.esc="cancelChange"
-    @blur="cancelChange">
-</td>
+<input type="text" :value="value"
+  :class="['text-editor', classes.input]"
+  :style="styles.input"
+  @keyup.enter="acceptChange(column.id, $event.target.value, value)"
+  @keyup.esc="cancelChange"
+  @blur="cancelChange">
 </template>
 
 <script>
