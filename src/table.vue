@@ -21,7 +21,8 @@
         :class="classes.row || 'st-row'" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf"
           :key="column.id"
-          :class="classes.cell || 'st-cell'" :style="styles.cell">
+          :class="classes.cell || 'st-cell'" :style="styles.cell"
+          @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
             :row-index="rowIndex" :row="row"
@@ -35,7 +36,8 @@
       <tr v-for="(row, rowIndex) in rows" :key="row[idProp] || rowIndex"
           :class="classes.row || 'st-row'" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf" :key="column.id"
-            :class="classes.cell || 'st-cell'" :style="styles.cell">
+          :class="classes.cell || 'st-cell'" :style="styles.cell"
+          @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
             :row-index="rowIndex" :row="row"
@@ -176,6 +178,9 @@ const component = {
 
       // reemit cell-change event
       this.$emit("cell-change", $event);
+    },
+    clickCell(v){
+      console.log(v);
     }
   },
   watch: {
