@@ -15,9 +15,13 @@
   </div>
   <div class="template">
     <st-table :columns="columns" :rows="rows"
-      :classes="classes" :group="group"
-      @cell-change="cellChange">
+      :classes="classes" :group="group" picked-prop="picked"
+      @cell-change="cellChange"
+      @selection-change="selectionChange">
     </st-table>
+  </div>
+  <div class="options" style="border: none">
+    {{selectionNames}}
   </div>
 </form>
 </template>
@@ -45,7 +49,6 @@ export default {
             component: 'st-cell-row-picker', 
             showContent: false, 
             showRowNumber: true, 
-            pickedProp: 'picked', 
             classes: { label: 'label', input: 'ui-widget-content', span: 'tt' }
           }
         },
@@ -82,7 +85,8 @@ export default {
         },
         row: "st-row ui-widget-content",
         groupRow: "st-group-row ui-widget-content"
-      }
+      },
+      selectionNames: ""
     };
   },
   components: {
@@ -113,6 +117,10 @@ export default {
     },
     cellChange($event) {
       console.log("RC[%d, %d]: newValue=%s, oldValue=%s, $event=%o", $event.rowIndex, $event.columnIndex, $event.newValue, $event.oldValue, $event);
+    },
+    selectionChange(selection, oldValue) {
+      this.selectionNames = selection.map(r => r.name).join(", ")
+      console.log("selectionChange: new=%s, old=%s", this.selectionNames, oldValue.map(r => r.name).join(", "));
     }
   }
 };
