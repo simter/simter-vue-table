@@ -92,7 +92,8 @@ var groupByRows = function(rows, groupKey, defaultGroups) {
 
 const component = {
   props: {
-    idProp: { type: String, required: false, default: 'id' },
+    idProp: { type: String, required: false, default: "id" },
+    pickedProp: { type: String, required: false, default: "picked" },
     withoutThead: { type: Boolean, required: false, default: false },
     columns: { type: Array, required: true },
     rows: {

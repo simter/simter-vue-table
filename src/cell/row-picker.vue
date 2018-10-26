@@ -17,7 +17,7 @@ export default {
   computed: {
     // the prop name that holds the picker status value
     pickedProp() {
-      return this.cfg.pickedProp || this.column.id;
+      return this.cfg.pickedProp || this.$parent.pickedProp || this.column.id || 'picked';
     },
     // the picker status
     picked: {
