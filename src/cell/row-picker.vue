@@ -25,7 +25,7 @@ export default {
         return this.row[this.pickedProp];
       },
       set(value) {
-        this.acceptChange(this.pickedProp, value, !value);
+        this.acceptChange(this.pickedProp, value, !value, this.$el.firstElementChild);
       }
     }
   }

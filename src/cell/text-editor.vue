@@ -2,7 +2,7 @@
 <input type="text" :value="value"
   :class="['text-editor', classes.input]"
   :style="styles.input"
-  @keyup.enter="acceptChange(column.id, $event.target.value, value)"
+  @keyup.enter="acceptChange(column.id, $event.target.value, value, $event.target)"
   @keyup.esc="cancelChange"
   @blur="cancelChange">
 </template>

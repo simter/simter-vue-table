@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     /** Accept the cell value change and emit cell-change event */
-    acceptChange(prop, newValue, oldValue) {
+    acceptChange(prop, newValue, oldValue, target) {
       if (newValue != oldValue) {
         // console.log("acceptChange %s: newValue=%s, oldValue=%s", this.rc, newValue, oldValue);
 
@@ -49,13 +49,15 @@ export default {
         this.$set(this.row, prop, newValue);
 
         // emit cell change event
-        this.$emit("cell-change", {
+        const data = {
           newValue, oldValue,
           columnIndex: this.columnIndex,
           column: this.column,
           rowIndex: this.rowIndex,
           row: this.row
-        });
+        }
+        if (target) data.target = target
+        this.$emit("cell-change", data);
       }
     }
   }
