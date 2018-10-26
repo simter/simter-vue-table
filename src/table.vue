@@ -134,14 +134,19 @@ const component = {
     $_rootClass() {
       return "class" in this.$vnode.data ? "" : "st-table";
     },
-    /**  */
+    /** Polishing the `group` config to a standard Object format */
     $_group() {
       return typeof this.group !== "object" ? { prop: this.group } : this.group;
     },
-    /**  */
+    /** Group the rows by the `group` prop config */
     $_groupedRows() {
       if (!this.$_group) return null;
       return groupByRows(this.rows, this.$_group.prop, this.$_group.names);
+    },
+    /** Collect all the selected row by the `pickedProp`'s boolean value */
+    selection() {
+      if (!this.rows) return [];
+      else return this.rows.filter(r => r[this.pickedProp]);
     }
   },
   components: {
@@ -171,6 +176,11 @@ const component = {
 
       // reemit cell-change event
       this.$emit("cell-change", $event);
+    }
+  },
+  watch: {
+    selection(newValue, oldValue){
+      this.$emit("selection-change", newValue, oldValue);
     }
   }
 };
