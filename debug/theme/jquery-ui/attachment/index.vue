@@ -14,14 +14,15 @@
     </h2>
   </div>
   <div class="template">
-    <st-table :columns="columns" :rows="rows"
+    <st-table ref="myTable" :columns="columns" :rows="rows"
       :classes="classes" :group="group" picked-prop="picked"
       @cell-change="cellChange"
       @cell-click="cellClick"
       @selection-change="selectionChange">
     </st-table>
   </div>
-  <div class="options" style="border: none">
+  <div class="options" style="border: none" v-if="selectionNames">
+    <input type="button" @click.stop.prevent="deleteSelection()" value="删除选中的行">
     {{selectionNames}}
   </div>
 </form>
@@ -121,6 +122,9 @@ export default {
     },
     cellClick($event) {
       console.log("cell click RC[%d, %d]: target=%s", $event.rowIndex, $event.columnIndex, $event.target);
+    },
+    deleteSelection($event) {
+      this.$refs.myTable.deleteSelection();
     },
     selectionChange(selection, oldValue) {
       this.selectionNames = selection.map(r => r.name).join(", ")
