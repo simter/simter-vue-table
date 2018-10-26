@@ -17,6 +17,7 @@
     <st-table :columns="columns" :rows="rows"
       :classes="classes" :group="group" picked-prop="picked"
       @cell-change="cellChange"
+      @cell-click="cellClick"
       @selection-change="selectionChange">
     </st-table>
   </div>
@@ -116,7 +117,10 @@ export default {
       document.getElementById('theme').href = this.ui.themes[this.ui.theme];
     },
     cellChange($event) {
-      console.log("RC[%d, %d]: newValue=%s, oldValue=%s, $event=%o", $event.rowIndex, $event.columnIndex, $event.newValue, $event.oldValue, $event);
+      console.log("cell change RC[%d, %d]: newValue=%s, oldValue=%s, $event=%o", $event.rowIndex, $event.columnIndex, $event.newValue, $event.oldValue, $event);
+    },
+    cellClick($event) {
+      console.log("cell click RC[%d, %d]: target=%s", $event.rowIndex, $event.columnIndex, $event.target);
     },
     selectionChange(selection, oldValue) {
       this.selectionNames = selection.map(r => r.name).join(", ")
