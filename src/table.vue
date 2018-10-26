@@ -179,12 +179,14 @@ const component = {
       // reemit cell-change event
       this.$emit("cell-change", $event);
     },
-    clickCell(v){
-      console.log(v);
+    deleteSelection() {
+      this.selection.forEach(r =>
+        this.$delete(this.rows, this.rows.indexOf(r))
+      );
     }
   },
   watch: {
-    selection(newValue, oldValue){
+    selection(newValue, oldValue) {
       this.$emit("selection-change", newValue, oldValue);
     }
   }
