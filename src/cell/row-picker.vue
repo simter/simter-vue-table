@@ -2,7 +2,7 @@
 <label :class="['row-picker', classes.label]" :style="styles.label">
   <input type="checkbox" v-model="picked" :class="classes.input" :style="styles.input">
   <span v-if="cfg.showRowNumber" :class="classes.span" :style="styles.span"
-    >{{rowIndex + 1}}</span>
+    >{{rowIndex - (groupRow ? groupRow.rowIndex : 0)}}</span>
   <span v-if="cfg.showContent" :class="classes.span" :style="styles.span"
     >{{content}}</span>
 </label>

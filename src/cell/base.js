@@ -6,7 +6,10 @@ export default {
 
     // row
     rowIndex: { type: Number, required: true },
-    row: { type: Object, required: true }
+    row: { type: Object, required: true },
+
+    // groupRow
+    groupRow: { type: Object, required: false }
   },
   computed: {
     // cell config by column

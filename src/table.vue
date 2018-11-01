@@ -6,18 +6,23 @@
          :classes="classes.thead"
          :styles="styles.thead"></thead>
   <tbody :class="classes.tbody" :style="styles.tbody">
-    <template v-if="group" v-for="(rows, groupKey) in $_groupedRows">
+    <template v-if="group" v-for="groupRow in $_groupedRows">
       <!-- generate group row -->
-      <tr :key="groupKey" :class="classes.groupRow || 'st-group-row'"
+      <tr :key="groupRow.rowIndex" :class="classes.groupRow || 'st-group-row'"
         :style="styles.groupRow">
         <td :class="classes.groupCell || 'st-group-cell'"
           :style="styles.groupCell"
-          :colspan="$_columnsLeaf.length"
-          >{{groupKey}}</td>
+          :colspan="$_columnsLeaf.length">
+          <component :is="$_group.component || 'st-cell-text'"
+            :column-index="0" :column="{id: 'id', cell: $_group.cell}"
+            :row-index="groupRow.rowIndex" :row="groupRow"
+            @cell-change="reemitCellChangeEvent">
+          </component>
+        </td>
       </tr>
       <!-- generate group's data row -->
-      <tr v-for="(row, rowIndex) in rows"
-        :key="groupKey + (row[idProp] || rowIndex)"
+      <tr v-for="(row, rowIndex) in groupRow.rows"
+        :key="groupRow.rowIndex + rowIndex + 1"
         :class="classes.row || 'st-row'" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf"
           :key="column.id"
@@ -25,7 +30,8 @@
           @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
-            :row-index="rowIndex" :row="row"
+            :row-index="groupRow.rowIndex + rowIndex + 1" :row="row"
+            :group-row="groupRow"
             @cell-change="reemitCellChangeEvent">
           </component>
         </td>
@@ -53,6 +59,7 @@
 <script>
 import colgroup from "simter-vue-colgroup";
 import thead from "simter-vue-thead";
+import groupRows from "./utils/group";
 
 // inner cell components
 import cellText from "./cell/text.vue";
@@ -66,30 +73,6 @@ const cells = {
   "st-cell-row-picker": cellRowPicker,
   "st-cell-text-editor": cellTextEditor,
   "st-cell-number-editor": cellNumberEditor
-};
-
-/**
- * var rows = [{g: 'b', id: 22}, {g: 'a', id: 11}, {g: 'b', id: 21}, {id: 52}, {id: 50}]
- * groupBy(rows, 'g', ['c', 'd']) :
- * {
- *   b: [{g: 'b', id: 22}, {g: 'b', id: 21}],
- *   a: [{g: 'a', id: 11}],
- *   undefined: [{id: 52}, {id: 50}],
- *   c: [],
- *   d: []
- * }
- */
-var groupByRows = function(rows, groupKey, defaultGroups) {
-  const groupRows = rows.reduce(function(rv, row) {
-    (rv[row[groupKey]] = rv[row[groupKey]] || []).push(row);
-    return rv;
-  }, {});
-
-  if (defaultGroups)
-    defaultGroups
-      .filter(g => !(g in groupRows))
-      .forEach(g => (groupRows[g] = []));
-  return groupRows;
 };
 
 const component = {
@@ -138,12 +121,12 @@ const component = {
     },
     /** Polishing the `group` config to a standard Object format */
     $_group() {
-      return typeof this.group !== "object" ? { prop: this.group } : this.group;
+      return typeof this.group === "string" ? { prop: this.group } : this.group;
     },
     /** Group the rows by the `group` prop config */
     $_groupedRows() {
       if (!this.$_group) return null;
-      return groupByRows(this.rows, this.$_group.prop, this.$_group.names);
+      return groupRows(this.rows, this.$_group);
     },
     /** Collect all the selected row by the `pickedProp`'s boolean value */
     selection() {
