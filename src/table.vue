@@ -13,7 +13,7 @@
         <td :class="classes.groupCell || 'st-group-cell'"
           :style="styles.groupCell"
           :colspan="$_columnsLeaf.length">
-          <component :is="$_group.component || 'st-cell-text'"
+          <component :is="$_getCellComponent($_group)"
             :column-index="0" :column="{id: 'id', cell: $_group.cell}"
             :row-index="groupRow.rowIndex" :row="groupRow"
             @cell-change="reemitCellChangeEvent">

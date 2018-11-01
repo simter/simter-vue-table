@@ -32,9 +32,9 @@
 import table from "../../../../src/table.vue";
 const groupConfig = {
   prop: "group",
-  component: "st-cell-text-editor",
   names: ["流程类", "诉讼类"],
   cell: {
+    component: "st-cell-text-editor",
     classes: { input: "ui-widget-content" },
     styles: { input: "width: 22.1em" }
   }
