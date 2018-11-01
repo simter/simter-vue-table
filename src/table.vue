@@ -60,6 +60,11 @@
 import colgroup from "simter-vue-colgroup";
 import thead from "simter-vue-thead";
 import groupRows from "./utils/group";
+import { deepAssign, merge } from "./utils/smart-assign";
+import {
+  classes as jquiClasses,
+  cell as jquiCell
+} from "./integration/jquery-ui";
 
 // inner cell components
 import cellText from "./cell/text.vue";
@@ -196,6 +201,9 @@ function flatten(columns) {
   );
 }
 
-export { flatten };
+const integration = {
+  jqui: { classes: jquiClasses, cell: jquiCell }
+};
+export { flatten, integration };
 export default component;
 </script>

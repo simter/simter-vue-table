@@ -29,15 +29,15 @@
 </template>
 
 <script>
-import table from "../../../../src/table.vue";
+import { default as table, integration } from "../../../../src/table.vue";
+const classes = integration.jqui.classes
+const cell = integration.jqui.cell
 const groupConfig = {
   prop: "group",
   names: ["流程类", "诉讼类"],
-  cell: {
-    component: "st-cell-text-editor",
-    classes: { input: "ui-widget-content" },
+  cell: cell("st-cell-text-editor", {
     styles: { input: "width: 22.1em" }
-  }
+  })
 };
 export default {
   data() {
@@ -60,21 +60,13 @@ export default {
           id: "sn",
           label: "序号",
           width: "3em",
-          cell: {
-            component: "st-cell-row-picker",
-            showContent: false,
-            showRowNumber: true,
-            classes: { label: "label", input: "ui-widget-content", span: "tt" }
-          }
+          cell: cell("st-cell-row-picker", { showRowNumber: true })
         },
         {
           id: "name",
           label: "名称",
           width: "16em",
-          cell: {
-            component: "st-cell-text-editor",
-            classes: { input: "ui-widget-content" }
-          }
+          cell: cell("st-cell-text-editor")
         },
         { id: "ext", label: "类型", width: "3em", cell: { class: "ext" } },
         {
@@ -84,10 +76,7 @@ export default {
               id: "size",
               label: "大小",
               width: "4em",
-              cell: {
-                component: "st-cell-number-editor",
-                classes: { input: "ui-widget-content" }
-              }
+              cell: cell("st-cell-number-editor")
             },
             { id: "unit", label: "单位", width: "3em" }
           ]
@@ -96,12 +85,11 @@ export default {
           id: "updateTime",
           label: "更新时间",
           width: "13em",
-          cell: {
-            component: "st-cell-html",
+          cell: cell("st-cell-html", {
             render: function(value, row) {
               return `${value} <i><u>${row.updater}</u></i>`;
             }
-          }
+          })
         }
       ],
       rows: [
@@ -157,14 +145,7 @@ export default {
         }
       ],
       group: groupConfig,
-      classes: {
-        thead: {
-          tr: "st-header ui-widget-content",
-          th: "st-cell"
-        },
-        row: "st-row ui-widget-content",
-        groupRow: "st-group-row ui-widget-content"
-      },
+      classes: classes,
       selectionNames: ""
     };
   },
