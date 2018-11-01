@@ -52,7 +52,9 @@ body {
   text-align: right;
 }
 
-.st-row .st-cell .text-editor, .st-row .st-cell .number-editor  {
+.st-group-row .st-group-cell .text-editor, 
+.st-row .st-cell .text-editor, 
+.st-row .st-cell .number-editor  {
   box-sizing: border-box;
   width: 100%;
   padding: 0.25em;
