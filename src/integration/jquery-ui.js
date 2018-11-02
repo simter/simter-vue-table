@@ -5,12 +5,21 @@ import { deepAssign } from "../utils/smart-assign";
 
 // table's classes config
 const classes = {
+  table: ["ui-widget-content"],
   thead: {
-    tr: "st-header ui-widget-content",
+    tr: "st-row",
     th: "st-cell"
+  }
+}
+const inherit = "border-color:inherit;border-style:inherit;border-width:inherit";
+const styles = {
+  thead: {
+    thead: inherit,
+    tr: inherit,
+    th: inherit
   },
-  row: "st-row ui-widget-content",
-  groupRow: "st-group-row ui-widget-content"
+  row: inherit,
+  groupRow: inherit
 }
 
 // inner cell component config

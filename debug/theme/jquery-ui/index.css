@@ -2,36 +2,65 @@
   background-image: none;
 }
 
-.st-table .st-header, .st-table .st-row, .st-table .st-group-row {
-  border-width: 1px;
-  /* 0 to no outer border*/
-}
-
-.st-cell, .st-group-cell {
-  font-weight: normal;
+.st-table > thead,
+.st-table > tbody,
+.st-row,
+.st-cell,
+.st-group-row,
+.st-group-cell {
   border-color: inherit;
   border-style: inherit;
-  padding: 0.25em;
+  border-width: inherit;
+}
+.st-cell,
+.st-group-cell {
+  border-width: 1px;
 }
 
-.st-header .st-cell {
-  border-width: 0 1px 0 1px;
+/** hide outer line start */
+.st-table.no-outer-border {
+  border-width: 0;
 }
-
-.st-row .st-cell {
-  border-width: 1px 1px 0 1px;
-}
-
-.st-group-row .st-group-cell {
-  border-width: 1px 1px 0 1px;
-}
-
-.st-cell:first-child, .st-group-cell:first-child {
+.st-table.no-outer-border .st-cell:first-child,
+.st-table.no-outer-border .st-group-cell:first-child {
   border-left-width: 0;
 }
-
-.st-cell:last-child, .st-group-cell:last-child {
+.st-table.no-outer-border .st-cell:last-child,
+.st-table.no-outer-border .st-group-cell:last-child {
   border-right-width: 0;
+}
+.st-table.no-outer-border > thead > tr:first-child > th {
+  border-top-width: 0;
+}
+.st-table.no-outer-border > tbody > tr:last-child > td {
+  border-bottom-width: 0;
+}
+/** hide outer line end */
+
+/** hide inner vertical line start */
+.st-table.no-column-border .st-cell,
+.st-table.no-column-border .st-group-cell {
+  border-left-width: 0;
+  border-right-width: 0;
+}
+/** hide inner vertical end */
+
+/** hide inner horizonal line start */
+.st-table.no-row-border thead,
+.st-table.no-row-border tbody,
+.st-table.no-row-border tr,
+.st-table.no-row-border .st-cell,
+.st-table.no-row-border .st-group-cell {
+  border-top-width: 0;
+  border-bottom-width: 0;
+}
+.st-table.no-row-border thead {
+  border-bottom-width: 1px;
+}
+/** hide inner horizonal end */
+
+.st-cell, .st-group-cell {
+  padding: 0.25em;
 }
 
 .st-cell .number-editor {
@@ -44,16 +73,5 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.25em;
-}
-
-.monospace {
-  font-family: Menlo, "宋体", sans-serif;
-}
-
-.align-center {
-  text-align: center
-}
-
-.align-right {
-  text-align: right
+  font: inherit;
 }

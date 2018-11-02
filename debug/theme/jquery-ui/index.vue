@@ -25,7 +25,9 @@
 </template>
 
 <script>
-import table from "../../../src/table.vue";
+import { default as table, integration } from "../../../src/table.vue";
+const classes = integration.jqui.classes
+const cell = integration.jqui.cell
 export default {
   data() {
     return {
@@ -50,14 +52,15 @@ export default {
         { sn: 3, first: "Larry", last: "the Bird", handle: "@twitter" },
         { sn: 4, first: "Larry", last: "auto wrap the content?", handle: "@twitter" },
         { sn: 5, first: "Larry", last: "the Bird", handle: "@twitter" }
-      ]
+      ],
+      classes
     };
   },
   components: {
     "st-table": table
   },
   computed: {
-    classes() {
+    classes1() {
       const t = {
         table: "table",
         thead: {
