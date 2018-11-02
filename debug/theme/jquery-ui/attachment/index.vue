@@ -50,16 +50,8 @@
 </template>
 
 <script>
-import { default as table, integration } from "../../../../src/table.vue";
-const classes = integration.jqui.classes;
-const cell = integration.jqui.cell;
-const groupConfig = {
-  prop: "group",
-  names: ["流程类", "诉讼类"],
-  cell: cell("st-cell-text-editor", {
-    styles: { input: "width: 15em" }
-  })
-};
+import table from "../../../../src/table.vue";
+import { classes, cell } from "../../../../src/integration/jquery-ui";
 export default {
   data() {
     return {

@@ -25,9 +25,8 @@
 </template>
 
 <script>
-import { default as table, integration } from "../../../src/table.vue";
-const classes = integration.jqui.classes
-const cell = integration.jqui.cell
+import table from "../../../src/table.vue";
+import { classes, cell } from "../../../src/integration/jquery-ui";
 export default {
   data() {
     return {
