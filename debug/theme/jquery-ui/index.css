@@ -1,18 +1,4 @@
-body {
-  padding: 0;
-  margin: 0
-}
-
-.options {
-  margin-top: 1em
-}
-
-.st-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.st-table .ui-widget-content {
+.ui-widget-content {
   background-image: none;
 }
 
