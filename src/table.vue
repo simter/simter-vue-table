@@ -1,5 +1,5 @@
 <template>
-<table :class="$_rootClass" :style="styles.root">
+<table :class="['st-table', classes.table]" :style="styles.root">
   <colgroup is="st-colgroup" :columns="columns"></colgroup>
   <thead v-if="!withoutThead" is="st-thead"
          :columns="columns"
@@ -8,9 +8,9 @@
   <tbody :class="classes.tbody" :style="styles.tbody">
     <template v-if="group" v-for="groupRow in $_groupedRows">
       <!-- generate group row -->
-      <tr :key="groupRow.rowIndex" :class="classes.groupRow || 'st-group-row'"
+      <tr :key="groupRow.rowIndex" :class="['st-group-row', classes.groupRow]"
         :style="styles.groupRow">
-        <td :class="classes.groupCell || 'st-group-cell'"
+        <td :class="['st-group-cell', classes.groupCell]"
           :style="styles.groupCell"
           :colspan="$_columnsLeaf.length">
           <component :is="$_getCellComponent($_group)"
@@ -23,10 +23,10 @@
       <!-- generate group's data row -->
       <tr v-for="(row, rowIndex) in groupRow.rows"
         :key="groupRow.rowIndex + rowIndex + 1"
-        :class="classes.row || 'st-row'" :style="styles.row">
+        :class="['st-row', classes.row]" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf"
           :key="column.id"
-          :class="classes.cell || 'st-cell'" :style="styles.cell"
+          :class="['st-cell', classes.cell]" :style="styles.cell"
           @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
@@ -40,9 +40,9 @@
     <template v-if="!group">
       <!-- generate data row -->
       <tr v-for="(row, rowIndex) in rows" :key="row[idProp] || rowIndex"
-          :class="classes.row || 'st-row'" :style="styles.row">
+          :class="['st-row', classes.row]" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf" :key="column.id"
-          :class="classes.cell || 'st-cell'" :style="styles.cell"
+          :class="['st-cell', classes.cell]" :style="styles.cell"
           @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
@@ -102,9 +102,6 @@ const component = {
     },
     group: { type: [String, Object], required: false }
   },
-  data() {
-    return { defaultCellClass: "st-cell" };
-  },
   computed: {
     /**
      * The result of function call flatten(this.columns).
@@ -112,10 +109,6 @@ const component = {
      */
     $_columnsLeaf() {
       return flatten(this.columns);
-    },
-    /** Use user define class by `:class`, otherwise use default class. */
-    $_rootClass() {
-      return "class" in this.$vnode.data ? "" : "st-table";
     },
     /** Polishing the `group` config to a standard Object format */
     $_group() {
