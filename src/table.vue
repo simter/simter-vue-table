@@ -72,13 +72,6 @@ import cellHtml from "./cell/html.vue";
 import cellRowPicker from "./cell/row-picker.vue";
 import cellTextEditor from "./cell/text-editor.vue";
 import cellNumberEditor from "./cell/number-editor.vue";
-const cells = {
-  "st-cell-text": cellText,
-  "st-cell-html": cellHtml,
-  "st-cell-row-picker": cellRowPicker,
-  "st-cell-text-editor": cellTextEditor,
-  "st-cell-number-editor": cellNumberEditor
-};
 
 const component = {
   props: {
@@ -142,7 +135,12 @@ const component = {
   components: {
     "st-colgroup": colgroup,
     "st-thead": thead,
-    ...cells
+
+    "st-cell-text": cellText,
+    "st-cell-html": cellHtml,
+    "st-cell-row-picker": cellRowPicker,
+    "st-cell-text-editor": cellTextEditor,
+    "st-cell-number-editor": cellNumberEditor
   },
   methods: {
     $_getCellComponent(column) {
