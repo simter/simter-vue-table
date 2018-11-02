@@ -42,7 +42,7 @@
   <script src="./index.js"></script>
   <script>
     const iframes = []
-    function autoHeight(iframe) {
+    window['autoHeight'] = function(iframe) {
       iframes.push(iframe)
     }
     setInterval(() => {
