@@ -13,19 +13,18 @@ Options:
 | &nbsp;&nbsp;&nbsp;&nbsp;label    | The column's visible text
 | &nbsp;&nbsp;&nbsp;&nbsp;width    | The column's width
 | &nbsp;&nbsp;&nbsp;&nbsp;children | Define how to group columns. The `id` and `width` will be ignored if define this property
+| &nbsp;&nbsp;&nbsp;&nbsp;cell     | Define cell customized {type, class, style, classes, styles, ...customProps}
 | rows                             | The table's row data
 | classes                          | Define component class
 | &nbsp;&nbsp;&nbsp;&nbsp;thead    | thead sub-component classes, follow [simter-vue-thead] `classes`  prop
-| &nbsp;&nbsp;&nbsp;&nbsp;table    | table class, follow [Vue Class Bindings]
 | &nbsp;&nbsp;&nbsp;&nbsp;tbody    | tbody class, follow [Vue Class Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;tr       | tbody/tr class, follow [Vue Class Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;td       | tbody/tr/td class, follow [Vue Class Bindings]
+| &nbsp;&nbsp;&nbsp;&nbsp;row      | tbody/tr class, follow [Vue Class Bindings]
+| &nbsp;&nbsp;&nbsp;&nbsp;cell     | tbody/tr/td class, follow [Vue Class Bindings]
 | styles                           | Define component style
 | &nbsp;&nbsp;&nbsp;&nbsp;thead    | thead sub-component styles, follow [simter-vue-thead] `styles`  prop
-| &nbsp;&nbsp;&nbsp;&nbsp;table    | table style, follow [Vue Style Bindings]
 | &nbsp;&nbsp;&nbsp;&nbsp;tbody    | tbody style, follow [Vue Style Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;tr       | tbody/tr style, follow [Vue Style Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;td       | tbody/tr/td style, follow [Vue Style Bindings]
+| &nbsp;&nbsp;&nbsp;&nbsp;row      | tbody/tr style, follow [Vue Style Bindings]
+| &nbsp;&nbsp;&nbsp;&nbsp;cell     | tbody/tr/td style, follow [Vue Style Bindings]
 
 [simter-vue-thead]: https://github.com/simter/simter-vue-thead
 [Vue Class Bindings]: https://vuejs.org/v2/guide/class-and-style.html

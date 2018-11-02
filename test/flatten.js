@@ -1,5 +1,5 @@
 import test from 'ava'
-import { flatten } from '../src/table.vue'
+import flatten from '../src/utils/flatten'
 
 test('should be a function', t => {
   t.is(typeof flatten, "function")
