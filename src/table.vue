@@ -37,7 +37,7 @@
         </td>
       </tr>
     </template>
-    <template v-else>
+    <template v-if="!group">
       <!-- generate data row -->
       <tr v-for="(row, rowIndex) in rows" :key="row[idProp] || rowIndex"
           :class="classes.row || 'st-row'" :style="styles.row">
