@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table v0.4.0
+* simter-vue-table v0.5.0
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */
@@ -489,68 +489,6 @@ __vue_render__$1._withStripped = true;
     undefined
   );
 
-//
-
-const component$2 = {
-  replace: true,
-  props: {
-    thead: { type: Boolean, required: false, default() { return true } },
-    columns: { type: Array, required: true },
-    rows: {
-      type: Array,
-      required: false,
-      default() {
-        return [];
-      }
-    },
-    classes: {
-      type: String | Object | Array,
-      required: false,
-      default() {
-        return {};
-      }
-    },
-    styles: {
-      type: String | Object | Array,
-      required: false,
-      default() {
-        return {};
-      }
-    }
-  },
-  computed: {
-    /**
-     * The result of function call flatten(this.columns).
-     * It gather all columns leaf to return.
-     */
-    columnsLeaf() {
-      return flatten$1(this.columns);
-    },
-    /**
-     * Convert String | Array to Object {table: ...}
-     */
-    $_classes() {
-      if (typeof this.classes === "string" || Array.isArray(this.classes))
-        return { table: this.classes };
-      else if (typeof this.classes === "object") return this.classes;
-      else return {};
-    },
-    /**
-     * Convert String | Array to Object {table: ...}
-     */
-    $_styles() {
-      if (typeof this.styles === "string" || Array.isArray(this.styles))
-        return { table: this.styles };
-      else if (typeof this.styles === "object") return this.styles;
-      else return {};
-    }
-  },
-  components: {
-    "st-colgroup": colgroup,
-    "st-thead": thead
-  }
-};
-
 /**
  * Flatten all leaf object to simple object array.
  *
@@ -572,58 +510,141 @@ function flatten$1(columns) {
   );
 }
 
+/**
+ * Group rows.
+ *  
+ * var rows = [
+ *   {g: 'b', id: 22}, 
+ *   {g: 'a', id: 11}, 
+ *   {g: 'b', id: 21}, 
+ *   {id: 52}, 
+ *   {id: 50}
+ * ]
+ * 
+ * group by {prop: 'g', names: ['c', 'd']} :
+ * 
+ * [
+ *   {rowIndex: 0, id: 'b', rows: [{g: 'b', id: 22}, {g: 'b', id: 21}]},
+ *   {rowIndex: 3, id: 'a', rows: [{g: 'a', id: 11}]},
+ *   {rowIndex: 5, id: undefined, rows: [{id: 52}, {id: 50}]},
+ *   {rowIndex: 8, id: 'c', rows: []},
+ *   {rowIndex: 9, id: 'd', rows: []}
+ * ]
+ */
+function groupRows (rows, group) {
+  const groupKey = group.prop;
+  const gi = {}; // {gN: index, ...}
+  let rowIndex = -1;
+  let index = -1;
+  const groupedRows = rows.reduce(function (rv, row) {
+    // record the groupName index
+    const g = row[groupKey];
+    if (!(g in gi)) gi[g] = ++index;
+
+    // generate a empty group item
+    const i = gi[g];
+    rv[i] = rv[i] || { rowIndex: ++rowIndex, id: row[groupKey], rows: [] };
+
+    // push row item into group.rows
+    rv[i].rows.push(row);
+    rowIndex++;
+
+    // recaculate all the next group item rowIndex
+    for (let j = i + 1; j < rv.length; j++) rv[j].rowIndex++;
+
+    return rv;
+  }, []);
+
+  if (group.names)
+    group.names
+      .filter(g => !(g in gi))
+      .forEach(g => groupedRows[groupedRows.length] = {
+        rowIndex: ++rowIndex, id: g, rows: []
+      });
+
+  return groupedRows;
+}
+
+var cellBase = {
+  props: {
+    // column
+    columnIndex: { type: Number, required: true },
+    column: { type: Object, required: true },
+
+    // row
+    rowIndex: { type: Number, required: true },
+    row: { type: Object, required: true },
+
+    // groupRow
+    groupRow: { type: Object, required: false }
+  },
+  computed: {
+    // cell config by column
+    cfg() {
+      return this.column.cell || {};
+    },
+    // cell backend value
+    value() {
+      return this.row[this.column.id];
+    },
+    // cell frontend content, text or html
+    content() {
+      return this.cfg.render
+        // render(value, row)
+        // can get more component instance data from `this`
+        ? this.cfg.render.call(this, this.value, this.row)
+        // origin value
+        : this.value;
+    },
+    // zero base RC string, such as '[1, 3]'
+    rc() {
+      return `[${this.rowIndex}, ${this.columnIndex}]`;
+    },
+    // control each descendant dom element class
+    classes() {
+      return this.cfg.classes || {};
+    },
+    // control each descendant dom element style
+    styles() {
+      return this.cfg.styles || {};
+    }
+  },
+  methods: {
+    /** Accept the cell value change and emit cell-change event */
+    acceptChange(prop, newValue, oldValue, target) {
+      if (newValue != oldValue) {
+        // console.log("acceptChange %s: newValue=%s, oldValue=%s", this.rc, newValue, oldValue);
+
+        // update the row data
+        this.$set(this.row, prop, newValue);
+
+        // emit cell change event
+        const data = {
+          newValue, oldValue,
+          columnIndex: this.columnIndex,
+          column: this.column,
+          rowIndex: this.rowIndex,
+          row: this.row
+        };
+        if (target) data.target = target;
+        this.$emit("cell-change", data);
+      }
+    }
+  }
+};
+
+//
+var script = { extends: cellBase };
+
 /* script */
-            const __vue_script__$2 = component$2;
+            const __vue_script__$2 = script;
             
 /* template */
 var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c(
-    "table",
-    { class: _vm.$_classes.table, style: _vm.$_styles.table },
-    [
-      _c("st-colgroup", { tag: "colgroup", attrs: { columns: _vm.columns } }),
-      _vm._v(" "),
-      _vm.thead
-        ? _c("st-thead", {
-            tag: "thead",
-            attrs: {
-              columns: _vm.columns,
-              classes: _vm.$_classes.thead,
-              styles: _vm.$_styles.thead
-            }
-          })
-        : _vm._e(),
-      _vm._v(" "),
-      _c(
-        "tbody",
-        { class: _vm.$_classes.tbody, style: _vm.$_styles.tbody },
-        _vm._l(_vm.rows, function(row, index) {
-          return _c(
-            "tr",
-            {
-              key: row.id || index,
-              class: _vm.$_classes.tr,
-              style: _vm.$_styles.tr
-            },
-            _vm._l(_vm.columnsLeaf, function(column) {
-              return _c(
-                "td",
-                {
-                  key: column.id,
-                  class: column.class || _vm.$_classes.td,
-                  style: column.style || _vm.$_styles.td
-                },
-                [_vm._v(_vm._s(row[column.id]))]
-              )
-            })
-          )
-        })
-      )
-    ]
-  )
+  return _c("span", [_vm._v(_vm._s(_vm.content))])
 };
 var __vue_staticRenderFns__$2 = [];
 __vue_render__$2._withStripped = true;
@@ -638,6 +659,741 @@ __vue_render__$2._withStripped = true;
   const __vue_is_functional_template__$2 = false;
   /* component normalizer */
   function __vue_normalize__$2(
+    template, style, script$$1,
+    scope, functional, moduleIdentifier,
+    createInjector, createInjectorSSR
+  ) {
+    const component = (typeof script$$1 === 'function' ? script$$1.options : script$$1) || {};
+
+    // For security concerns, we use only base name in production mode.
+    component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\text.vue";
+
+    if (!component.render) {
+      component.render = template.render;
+      component.staticRenderFns = template.staticRenderFns;
+      component._compiled = true;
+
+      if (functional) component.functional = true;
+    }
+
+    component._scopeId = scope;
+
+    return component
+  }
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var cellText = __vue_normalize__$2(
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    __vue_inject_styles__$2,
+    __vue_script__$2,
+    __vue_scope_id__$2,
+    __vue_is_functional_template__$2,
+    __vue_module_identifier__$2,
+    undefined,
+    undefined
+  );
+
+//
+var script$1 = { extends: cellBase };
+
+/* script */
+            const __vue_script__$3 = script$1;
+            
+/* template */
+var __vue_render__$3 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c("div", { domProps: { innerHTML: _vm._s(_vm.content) } })
+};
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__$3 = undefined;
+  /* scoped */
+  const __vue_scope_id__$3 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$3 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$3 = false;
+  /* component normalizer */
+  function __vue_normalize__$3(
+    template, style, script,
+    scope, functional, moduleIdentifier,
+    createInjector, createInjectorSSR
+  ) {
+    const component = (typeof script === 'function' ? script.options : script) || {};
+
+    // For security concerns, we use only base name in production mode.
+    component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\html.vue";
+
+    if (!component.render) {
+      component.render = template.render;
+      component.staticRenderFns = template.staticRenderFns;
+      component._compiled = true;
+
+      if (functional) component.functional = true;
+    }
+
+    component._scopeId = scope;
+
+    return component
+  }
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var cellHtml = __vue_normalize__$3(
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    __vue_inject_styles__$3,
+    __vue_script__$3,
+    __vue_scope_id__$3,
+    __vue_is_functional_template__$3,
+    __vue_module_identifier__$3,
+    undefined,
+    undefined
+  );
+
+//
+var script$2 = {
+  extends: cellBase,
+  computed: {
+    // the prop name that holds the picker status value
+    pickedProp() {
+      return this.cfg.pickedProp || this.$parent.pickedProp || this.column.id || 'picked';
+    },
+    // the picker status
+    picked: {
+      get() {
+        return this.row[this.pickedProp];
+      },
+      set(value) {
+        this.acceptChange(this.pickedProp, value, !value, this.$el.firstElementChild);
+      }
+    }
+  }
+};
+
+/* script */
+            const __vue_script__$4 = script$2;
+            
+/* template */
+var __vue_render__$4 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "label",
+    { class: ["row-picker", _vm.classes.label], style: _vm.styles.label },
+    [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.picked,
+            expression: "picked"
+          }
+        ],
+        class: _vm.classes.input,
+        style: _vm.styles.input,
+        attrs: { type: "checkbox" },
+        domProps: {
+          checked: Array.isArray(_vm.picked)
+            ? _vm._i(_vm.picked, null) > -1
+            : _vm.picked
+        },
+        on: {
+          change: function($event) {
+            var $$a = _vm.picked,
+              $$el = $event.target,
+              $$c = $$el.checked ? true : false;
+            if (Array.isArray($$a)) {
+              var $$v = null,
+                $$i = _vm._i($$a, $$v);
+              if ($$el.checked) {
+                $$i < 0 && (_vm.picked = $$a.concat([$$v]));
+              } else {
+                $$i > -1 &&
+                  (_vm.picked = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+              }
+            } else {
+              _vm.picked = $$c;
+            }
+          }
+        }
+      }),
+      _vm._v(" "),
+      _vm.cfg.showRowNumber
+        ? _c("span", { class: _vm.classes.span, style: _vm.styles.span }, [
+            _vm._v(
+              _vm._s(
+                _vm.groupRow
+                  ? _vm.rowIndex - _vm.groupRow.rowIndex
+                  : _vm.rowIndex + 1
+              )
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.cfg.showContent
+        ? _c("span", { class: _vm.classes.span, style: _vm.styles.span }, [
+            _vm._v(_vm._s(_vm.content))
+          ])
+        : _vm._e()
+    ]
+  )
+};
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__$4 = undefined;
+  /* scoped */
+  const __vue_scope_id__$4 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$4 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$4 = false;
+  /* component normalizer */
+  function __vue_normalize__$4(
+    template, style, script,
+    scope, functional, moduleIdentifier,
+    createInjector, createInjectorSSR
+  ) {
+    const component = (typeof script === 'function' ? script.options : script) || {};
+
+    // For security concerns, we use only base name in production mode.
+    component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\row-picker.vue";
+
+    if (!component.render) {
+      component.render = template.render;
+      component.staticRenderFns = template.staticRenderFns;
+      component._compiled = true;
+
+      if (functional) component.functional = true;
+    }
+
+    component._scopeId = scope;
+
+    return component
+  }
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var cellRowPicker = __vue_normalize__$4(
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    __vue_inject_styles__$4,
+    __vue_script__$4,
+    __vue_scope_id__$4,
+    __vue_is_functional_template__$4,
+    __vue_module_identifier__$4,
+    undefined,
+    undefined
+  );
+
+//
+var script$3 = {
+  extends: cellBase,
+  methods: {
+    cancelChange($event) {
+      $event.target.value = this.value;
+    }
+  }
+};
+
+/* script */
+            const __vue_script__$5 = script$3;
+            
+/* template */
+var __vue_render__$5 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c("input", {
+    class: ["text-editor", _vm.classes.input],
+    style: _vm.styles.input,
+    attrs: { type: "text" },
+    domProps: { value: _vm.value },
+    on: {
+      keyup: [
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+          ) {
+            return null
+          }
+          _vm.acceptChange(
+            _vm.column.id,
+            $event.target.value,
+            _vm.value,
+            $event.target
+          );
+        },
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "esc", 27, $event.key, "Escape")
+          ) {
+            return null
+          }
+          return _vm.cancelChange($event)
+        }
+      ],
+      blur: _vm.cancelChange
+    }
+  })
+};
+var __vue_staticRenderFns__$5 = [];
+__vue_render__$5._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__$5 = undefined;
+  /* scoped */
+  const __vue_scope_id__$5 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$5 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$5 = false;
+  /* component normalizer */
+  function __vue_normalize__$5(
+    template, style, script,
+    scope, functional, moduleIdentifier,
+    createInjector, createInjectorSSR
+  ) {
+    const component = (typeof script === 'function' ? script.options : script) || {};
+
+    // For security concerns, we use only base name in production mode.
+    component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\text-editor.vue";
+
+    if (!component.render) {
+      component.render = template.render;
+      component.staticRenderFns = template.staticRenderFns;
+      component._compiled = true;
+
+      if (functional) component.functional = true;
+    }
+
+    component._scopeId = scope;
+
+    return component
+  }
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var cellTextEditor = __vue_normalize__$5(
+    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    __vue_inject_styles__$5,
+    __vue_script__$5,
+    __vue_scope_id__$5,
+    __vue_is_functional_template__$5,
+    __vue_module_identifier__$5,
+    undefined,
+    undefined
+  );
+
+//
+var script$4 = {
+  extends: cellBase,
+  methods: {
+    cancelChange($event) {
+      $event.target.value = this.value;
+    }
+  }
+};
+
+/* script */
+            const __vue_script__$6 = script$4;
+            
+/* template */
+var __vue_render__$6 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c("input", {
+    class: ["number-editor", _vm.classes.input],
+    style: _vm.styles.input,
+    attrs: { type: "number" },
+    domProps: { value: _vm.value },
+    on: {
+      keyup: [
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+          ) {
+            return null
+          }
+          _vm.acceptChange(
+            _vm.column.id,
+            $event.target.value,
+            _vm.value,
+            $event.target
+          );
+        },
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "esc", 27, $event.key, "Escape")
+          ) {
+            return null
+          }
+          return _vm.cancelChange($event)
+        }
+      ],
+      blur: _vm.cancelChange
+    }
+  })
+};
+var __vue_staticRenderFns__$6 = [];
+__vue_render__$6._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__$6 = undefined;
+  /* scoped */
+  const __vue_scope_id__$6 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$6 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$6 = false;
+  /* component normalizer */
+  function __vue_normalize__$6(
+    template, style, script,
+    scope, functional, moduleIdentifier,
+    createInjector, createInjectorSSR
+  ) {
+    const component = (typeof script === 'function' ? script.options : script) || {};
+
+    // For security concerns, we use only base name in production mode.
+    component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\number-editor.vue";
+
+    if (!component.render) {
+      component.render = template.render;
+      component.staticRenderFns = template.staticRenderFns;
+      component._compiled = true;
+
+      if (functional) component.functional = true;
+    }
+
+    component._scopeId = scope;
+
+    return component
+  }
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var cellNumberEditor = __vue_normalize__$6(
+    { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+    __vue_inject_styles__$6,
+    __vue_script__$6,
+    __vue_scope_id__$6,
+    __vue_is_functional_template__$6,
+    __vue_module_identifier__$6,
+    undefined,
+    undefined
+  );
+
+//
+
+const component$2 = {
+  props: {
+    idProp: { type: String, required: false, default: "id" },
+    pickedProp: { type: String, required: false, default: "picked" },
+    withoutThead: { type: Boolean, required: false, default: false },
+    columns: { type: Array, required: true },
+    rows: {
+      type: Array,
+      required: false,
+      default() {
+        return [];
+      }
+    },
+    classes: {
+      type: Object,
+      required: false,
+      default() {
+        return {};
+      }
+    },
+    styles: {
+      type: Object,
+      required: false,
+      default() {
+        return {};
+      }
+    },
+    group: { type: [String, Object], required: false }
+  },
+  computed: {
+    /**
+     * The result of function call flatten(this.columns).
+     * It gather all columns leaf to return.
+     */
+    $_columnsLeaf() {
+      return flatten$1(this.columns);
+    },
+    /** Polishing the `group` config to a standard Object format */
+    $_group() {
+      return typeof this.group === "string" ? { prop: this.group } : this.group;
+    },
+    /** Group the rows by the `group` prop config */
+    $_groupedRows() {
+      if (!this.$_group) return null;
+      return groupRows(this.rows, this.$_group);
+    },
+    /** Collect all the selected row by the `pickedProp`'s boolean value */
+    selection() {
+      if (!this.rows) return [];
+      else return this.rows.filter(r => r[this.pickedProp]);
+    }
+  },
+  components: {
+    "st-colgroup": colgroup,
+    "st-thead": thead,
+
+    "st-cell-text": cellText,
+    "st-cell-html": cellHtml,
+    "st-cell-row-picker": cellRowPicker,
+    "st-cell-text-editor": cellTextEditor,
+    "st-cell-number-editor": cellNumberEditor
+  },
+  methods: {
+    $_getCellComponent(column) {
+      if (!column.cell) {
+        // global cell
+        return (
+          (typeof this.cell === "object" ? this.cell.component : this.cell) ||
+          "st-cell-text"
+        );
+      } else {
+        // column cell
+        return (
+          (typeof column.cell === "object"
+            ? column.cell.component
+            : column.cell) || "st-cell-text"
+        );
+      }
+    },
+    reemitCellChangeEvent($event) {
+      // console.log("in table: newValue=%s, oldValue=%s", $event.newValue, $event.oldValue);
+
+      // reemit cell-change event
+      this.$emit("cell-change", $event);
+    },
+    deleteSelection() {
+      this.selection.forEach(r =>
+        this.$delete(this.rows, this.rows.indexOf(r))
+      );
+    }
+  },
+  watch: {
+    selection(newValue, oldValue) {
+      this.$emit("selection-change", newValue, oldValue);
+    }
+  }
+};
+
+/* script */
+            const __vue_script__$7 = component$2;
+            
+/* template */
+var __vue_render__$7 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "table",
+    { class: ["st-table", _vm.classes.table], style: _vm.styles.root },
+    [
+      _c("st-colgroup", { tag: "colgroup", attrs: { columns: _vm.columns } }),
+      _vm._v(" "),
+      !_vm.withoutThead
+        ? _c("st-thead", {
+            tag: "thead",
+            attrs: {
+              columns: _vm.columns,
+              classes: _vm.classes.thead,
+              styles: _vm.styles.thead
+            }
+          })
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        { class: _vm.classes.tbody, style: _vm.styles.tbody },
+        [
+          _vm._l(_vm.$_groupedRows, function(groupRow) {
+            return _vm.group
+              ? [
+                  _c(
+                    "tr",
+                    {
+                      key: groupRow.rowIndex,
+                      class: ["st-group-row", _vm.classes.groupRow],
+                      style: _vm.styles.groupRow
+                    },
+                    [
+                      _c(
+                        "td",
+                        {
+                          class: ["st-group-cell", _vm.classes.groupCell],
+                          style: _vm.styles.groupCell,
+                          attrs: { colspan: _vm.$_columnsLeaf.length }
+                        },
+                        [
+                          _c(_vm.$_getCellComponent(_vm.$_group), {
+                            tag: "component",
+                            attrs: {
+                              "column-index": 0,
+                              column: { id: "id", cell: _vm.$_group.cell },
+                              "row-index": groupRow.rowIndex,
+                              row: groupRow
+                            },
+                            on: { "cell-change": _vm.reemitCellChangeEvent }
+                          })
+                        ],
+                        1
+                      )
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _vm._l(groupRow.rows, function(row, rowIndex) {
+                    return _c(
+                      "tr",
+                      {
+                        key: groupRow.rowIndex + rowIndex + 1,
+                        class: ["st-row", _vm.classes.row],
+                        style: _vm.styles.row
+                      },
+                      _vm._l(_vm.$_columnsLeaf, function(column, columnIndex) {
+                        return _c(
+                          "td",
+                          {
+                            key: column.id,
+                            class: ["st-cell", _vm.classes.cell],
+                            style: _vm.styles.cell,
+                            on: {
+                              click: function($event) {
+                                $event.stopPropagation();
+                                _vm.$emit("cell-click", {
+                                  rowIndex: rowIndex,
+                                  row: row,
+                                  columnIndex: columnIndex,
+                                  column: column,
+                                  row: row,
+                                  column: column,
+                                  target: $event.target
+                                });
+                              }
+                            }
+                          },
+                          [
+                            _c(_vm.$_getCellComponent(column), {
+                              tag: "component",
+                              attrs: {
+                                "column-index": columnIndex,
+                                column: column,
+                                "row-index": groupRow.rowIndex + rowIndex + 1,
+                                row: row,
+                                "group-row": groupRow
+                              },
+                              on: { "cell-change": _vm.reemitCellChangeEvent }
+                            })
+                          ],
+                          1
+                        )
+                      })
+                    )
+                  })
+                ]
+              : _vm._e()
+          }),
+          _vm._v(" "),
+          !_vm.group
+            ? _vm._l(_vm.rows, function(row, rowIndex) {
+                return _c(
+                  "tr",
+                  {
+                    key: row[_vm.idProp] || rowIndex,
+                    class: ["st-row", _vm.classes.row],
+                    style: _vm.styles.row
+                  },
+                  _vm._l(_vm.$_columnsLeaf, function(column, columnIndex) {
+                    return _c(
+                      "td",
+                      {
+                        key: column.id,
+                        class: ["st-cell", _vm.classes.cell],
+                        style: _vm.styles.cell,
+                        on: {
+                          click: function($event) {
+                            $event.stopPropagation();
+                            _vm.$emit("cell-click", {
+                              rowIndex: rowIndex,
+                              row: row,
+                              columnIndex: columnIndex,
+                              column: column,
+                              row: row,
+                              column: column,
+                              target: $event.target
+                            });
+                          }
+                        }
+                      },
+                      [
+                        _c(_vm.$_getCellComponent(column), {
+                          tag: "component",
+                          attrs: {
+                            "column-index": columnIndex,
+                            column: column,
+                            "row-index": rowIndex,
+                            row: row
+                          },
+                          on: { "cell-change": _vm.reemitCellChangeEvent }
+                        })
+                      ],
+                      1
+                    )
+                  })
+                )
+              })
+            : _vm._e()
+        ],
+        2
+      )
+    ]
+  )
+};
+var __vue_staticRenderFns__$7 = [];
+__vue_render__$7._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__$7 = undefined;
+  /* scoped */
+  const __vue_scope_id__$7 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$7 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$7 = false;
+  /* component normalizer */
+  function __vue_normalize__$7(
     template, style, script,
     scope, functional, moduleIdentifier,
     createInjector, createInjectorSSR
@@ -665,16 +1421,15 @@ __vue_render__$2._withStripped = true;
   
 
   
-  var table = __vue_normalize__$2(
-    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
-    __vue_inject_styles__$2,
-    __vue_script__$2,
-    __vue_scope_id__$2,
-    __vue_is_functional_template__$2,
-    __vue_module_identifier__$2,
+  var table = __vue_normalize__$7(
+    { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
+    __vue_inject_styles__$7,
+    __vue_script__$7,
+    __vue_scope_id__$7,
+    __vue_is_functional_template__$7,
+    __vue_module_identifier__$7,
     undefined,
     undefined
   );
 
 export default table;
-export { flatten$1 as flatten };
