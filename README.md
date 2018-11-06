@@ -6,25 +6,33 @@ A [Vue] component used to generate HTML \<[table]\> element.
 
 Options:
 
-| Name                             | Description
-|----------------------------------|--------------------
-| columns                          | Define table columns
-| &nbsp;&nbsp;&nbsp;&nbsp;id       | The column's id, it's the key in the `rows` item
-| &nbsp;&nbsp;&nbsp;&nbsp;label    | The column's visible text
-| &nbsp;&nbsp;&nbsp;&nbsp;width    | The column's width
-| &nbsp;&nbsp;&nbsp;&nbsp;children | Define how to group columns. The `id` and `width` will be ignored if define this property
-| &nbsp;&nbsp;&nbsp;&nbsp;cell     | Define cell customized {type, class, style, classes, styles, ...customProps}
-| rows                             | The table's row data
-| classes                          | Define component class
-| &nbsp;&nbsp;&nbsp;&nbsp;thead    | thead sub-component classes, follow [simter-vue-thead] `classes`  prop
-| &nbsp;&nbsp;&nbsp;&nbsp;tbody    | tbody class, follow [Vue Class Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;row      | tbody/tr class, follow [Vue Class Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;cell     | tbody/tr/td class, follow [Vue Class Bindings]
-| styles                           | Define component style
-| &nbsp;&nbsp;&nbsp;&nbsp;thead    | thead sub-component styles, follow [simter-vue-thead] `styles`  prop
-| &nbsp;&nbsp;&nbsp;&nbsp;tbody    | tbody style, follow [Vue Style Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;row      | tbody/tr style, follow [Vue Style Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;cell     | tbody/tr/td style, follow [Vue Style Bindings]
+| Name______________ | ValueType    | Description
+|---------------|--------------|-------------
+| columns       | \[{}\]       | Define table columns
+| ├ id          | String       | The column's id, it's the key in the `rows` item
+| ├ label       | String       | The column's visible text
+| ├ width       | String       | The column's width, such as `'2em'`
+| ├ children    | \[{}\]       | The child group columns. `id` and `width` will be ignored if define this property
+| ├ class       | String       | The specific class for all this column's td element
+| ├ style       | String       | The specific style for all this column's td element
+| ├ cell        | {} \| String | Define cell customized, `String` type means setting `component` value
+| │ ├ component | String       | The cell component's name
+| │ ├ classes   | {}           | Define the cell's inner dom elements classes, keys is up to the component design
+| │ ├ styles    | {}           | Define the cell's inner dom elements styles, keys is up to the component design
+| │ ├ ...customProps | custom  | The custom properties for all this column's cell component. It is up to the component design
+| rows          | \[{}\]       | The table's row data
+| classes       | {}           | Define inner dom elements global classes
+| ├ row         | String       | tbody/tr class, follow [Vue Class Bindings]
+| ├ cell        | String       | tbody/tr/td class, follow [Vue Class Bindings]
+| ├ groupRow    | String       | group tbody/tr class, follow [Vue Class Bindings]
+| ├ groupCell   | String       | group tbody/tr/td class, follow [Vue Class Bindings]
+| ├ table       | String       | table class, follow [Vue Class Bindings]
+| ├ tbody       | String       | tbody class, follow [Vue Class Bindings]
+| ├ thead       | {}           | thead sub-component classes, follow [simter-vue-thead] `classes`  prop
+| styles        | {}           | Define inner dom elements global styles, simular to `classes` prop
+| group         | {} \| String | Define how to group columns, `String` type means setting `prop` value
+| ├ prop        | String       | The group key in row item object
+| ├ cell        | {} \| String | The group cell component config, same as `columns[i].cell`
 
 [simter-vue-thead]: https://github.com/simter/simter-vue-thead
 [Vue Class Bindings]: https://vuejs.org/v2/guide/class-and-style.html
@@ -35,7 +43,7 @@ Options:
 
 ```
 yarn install  // or npm install
-npm run dev
+yarn run dev  // or npm run dev
 ```
 
 Use [parcel] to run the development debug.
@@ -43,7 +51,7 @@ Use [parcel] to run the development debug.
 ## Build
 
 ```
-npm run build
+yarn run build  // or npm run build
 ```
 
 Use [rollup] package the component to `dist` directory.
