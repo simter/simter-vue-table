@@ -26,7 +26,7 @@
         :class="['st-row', classes.row]" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf"
           :key="column.id"
-          :class="['st-cell', classes.cell]" :style="styles.cell"
+          :class="['st-cell', classes.cell, column.class]" :style="styles.cell"
           @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
@@ -42,7 +42,7 @@
       <tr v-for="(row, rowIndex) in rows" :key="row[idProp] || rowIndex"
           :class="['st-row', classes.row]" :style="styles.row">
         <td v-for="(column, columnIndex) in $_columnsLeaf" :key="column.id"
-          :class="['st-cell', classes.cell]" :style="styles.cell"
+          :class="['st-cell', classes.cell, column.class]" :style="styles.cell"
           @click.stop="$emit('cell-click', {rowIndex, row, columnIndex, column, row, column, target: $event.target})">
           <component :is="$_getCellComponent(column)"
             :column-index="columnIndex" :column="column"
