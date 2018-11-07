@@ -10,11 +10,19 @@
       <!-- generate group row -->
       <tr :key="groupRow.rowIndex" :class="['st-group-row', classes.groupRow]"
         :style="styles.groupRow">
+        <td v-if="$_group.selectable" :class="['st-group-cell', classes.groupCell]"
+          :style="styles.groupCell">
+          <component :is="'st-cell-row-picker'"
+            :column-index="0" :column="{id: 'id', cell: $_group.cell}"
+            :row-index="groupRow.rowIndex" :row="groupRow"
+            @cell-change="groupPickerChange">
+          </component>
+        </td>
         <td :class="['st-group-cell', classes.groupCell]"
           :style="styles.groupCell"
-          :colspan="$_columnsLeaf.length">
+          :colspan="$_columnsLeaf.length - ($_group.selectable ? 1 : 0)">
           <component :is="$_getCellComponent($_group)"
-            :column-index="0" :column="{id: 'id', cell: $_group.cell}"
+            :column-index="$_group.selectable ? 1 : 0" :column="{id: 'id', cell: $_group.cell}"
             :row-index="groupRow.rowIndex" :row="groupRow"
             @cell-change="reemitCellChangeEvent">
           </component>
@@ -149,6 +157,16 @@ const component = {
             : column.cell) || "st-cell-text"
         );
       }
+    },
+    groupPickerChange($event) {
+      console.log("group picker: %o", $event);
+
+      // picked all child row
+      const picked = $event.row.picked;
+      $event.row.rows.forEach(r => this.$set(r, "picked", picked));
+
+      // reemit cell-change event
+      this.$emit("cell-change", $event);
     },
     reemitCellChangeEvent($event) {
       // console.log("in table: newValue=%s, oldValue=%s", $event.newValue, $event.oldValue);
