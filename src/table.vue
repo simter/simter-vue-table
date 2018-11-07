@@ -66,6 +66,7 @@ import groupRows from "./utils/group";
 import cellText from "./cell/text.vue";
 import cellHtml from "./cell/html.vue";
 import cellRowPicker from "./cell/row-picker.vue";
+import cellRowNumber from "./cell/row-number.vue";
 import cellTextEditor from "./cell/text-editor.vue";
 import cellNumberEditor from "./cell/number-editor.vue";
 
@@ -128,6 +129,7 @@ const component = {
     "st-cell-text": cellText,
     "st-cell-html": cellHtml,
     "st-cell-row-picker": cellRowPicker,
+    "st-cell-row-number": cellRowNumber,
     "st-cell-text-editor": cellTextEditor,
     "st-cell-number-editor": cellNumberEditor
   },
