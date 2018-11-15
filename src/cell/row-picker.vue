@@ -1,10 +1,10 @@
 <template>
-<label :class="['row-picker', classes.label]" :style="styles.label">
-  <input type="checkbox" v-model="picked" :class="classes.input" :style="styles.input">
-  <span v-if="cfg.showRowNumber" :class="classes.span" :style="styles.span"
-    >{{groupRow ? rowIndex - groupRow.rowIndex : rowIndex + 1}}</span>
-  <span v-if="cfg.showContent" :class="classes.span" :style="styles.span"
-    >{{content}}</span>
+<label :class="['row-picker', classes.container]" :style="styles.container">
+  <input v-if="showPicker" type="checkbox" v-model="picked" 
+    :class="classes.picker" :style="styles.picker"
+    @change.stop="pickedEvent">
+  <span v-if="showNumber" :class="classes.number" :style="styles.number"
+    >{{(row.group ? row.group.index + 1 + '-' : '') + (row.index + 1)}}</span>
 </label>
 </template>
 
@@ -14,19 +14,38 @@
 import cellBase from "./base";
 export default {
   extends: cellBase,
-  computed: {
-    // the prop name that holds the picker status value
-    pickedProp() {
-      return this.cfg.pickedProp || this.$parent.pickedProp || this.column.id || 'picked';
-    },
-    // the picker status
-    picked: {
-      get() {
-        return this.row[this.pickedProp];
-      },
-      set(value) {
-        this.acceptChange(this.pickedProp, value, !value, this.$el.firstElementChild);
+  props: {
+    isGroupPicker: { type: Boolean, required: false, default: false },
+    showNumber: { type: Boolean, required: false, default: true },
+    showPicker: { type: Boolean, required: false, default: true }
+  },
+  data() {
+    return { picked: false };
+  },
+  created() {
+    // init the picked value
+    if (this.id) this.picked = this.row.value[this.id];
+  },
+  methods: {
+    pickedEvent() {
+      if (this.isGroupPicker) {
+        // pick all the children row
+        this.$parent.$refs.rowPicker
+          .filter(
+            t => t.row.group && t.row.group.rowIndex === this.row.rowIndex
+          )
+          .forEach(t => {
+            if (t.picked != this.picked) t.picked = this.picked;
+          });
+      } else if (this.row.group && !this.picked) {
+        // unpick group row's picker if it is picked
+        this.$parent.$refs.groupRowPicker
+          .filter(t => t.row.rowIndex === this.row.group.rowIndex)
+          .forEach(t => t.picked && (t.picked = false));
       }
+
+      // emit pick event
+      this.$emit("pick", { picked: this.picked, row: this.row });
     }
   }
 };

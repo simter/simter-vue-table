@@ -1,8 +1,8 @@
 <template>
-<input type="number" :value="value"
-  :class="['number-editor', classes.input]"
-  :style="styles.input"
-  @keyup.enter="acceptChange(column.id, $event.target.value, value, $event.target)"
+<input type="number" :value="num"
+  :class="['number-editor', classes.number]"
+  :style="styles.number"
+  @keyup.enter="acceptChange(mutate, $event.target.value, value, $event.target)"
   @keyup.esc="cancelChange"
   @blur="cancelChange">
 </template>
@@ -13,6 +13,13 @@
 import cellBase from "./base";
 export default {
   extends: cellBase,
+  data() {
+    return { num: null };
+  },
+  created() {
+    // init the text value
+    this.num = this.value;
+  },
   methods: {
     cancelChange($event) {
       $event.target.value = this.value;

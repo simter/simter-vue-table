@@ -39,6 +39,7 @@
     "babel-preset-env": "~1.7.0",
     "browser-env": "~3.2.5",
     "parcel-bundler": "~1.10.2",
+    "prettysize": "^1.1.0",
     "require-extension-hooks": "~0.3.2",
     "require-extension-hooks-babel": "~0.1.1",
     "require-extension-hooks-vue": "~1.1.0",
@@ -46,12 +47,12 @@
     "rollup-plugin-node-resolve": "~3.4.0",
     "rollup-plugin-vue": "~4.3.2",
     "simter-vue-colgroup": "~0.3.0",
-    "simter-vue-thead": "^0.3.2",
+    "simter-vue-thead": "^0.4.2",
     "stylus": "~0.54.5",
     "uglify-es": "~3.3.9",
     "vue": "~2.5.17",
-    "vue-template-compiler": "~2.5.17",
-    "vue-hot-reload-api": "^2.3.1"
+    "vue-hot-reload-api": "^2.3.1",
+    "vue-template-compiler": "~2.5.17"
   },
   "ava": {
     "babel": "inherit",

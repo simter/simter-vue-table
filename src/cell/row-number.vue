@@ -1,9 +1,9 @@
 <template>
-<div v-html="label"></div>
+<span>{{rowIndex + 1}}</span>
 </template>
 
 <script>
-// Html cell
+// show row number cell
 
 import cellBase from "./base";
 export default { extends: cellBase };

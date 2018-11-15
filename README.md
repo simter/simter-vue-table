@@ -6,25 +6,47 @@ A [Vue] component used to generate HTML \<[table]\> element.
 
 Options:
 
-| Name                             | Description
-|----------------------------------|--------------------
-| columns                          | Define table columns
-| &nbsp;&nbsp;&nbsp;&nbsp;id       | The column's id, it's the key in the `rows` item
-| &nbsp;&nbsp;&nbsp;&nbsp;label    | The column's visible text
-| &nbsp;&nbsp;&nbsp;&nbsp;width    | The column's width
-| &nbsp;&nbsp;&nbsp;&nbsp;children | Define how to group columns. The `id` and `width` will be ignored if define this property
-| &nbsp;&nbsp;&nbsp;&nbsp;cell     | Define cell customized {type, class, style, classes, styles, ...customProps}
-| rows                             | The table's row data
-| classes                          | Define component class
-| &nbsp;&nbsp;&nbsp;&nbsp;thead    | thead sub-component classes, follow [simter-vue-thead] `classes`  prop
-| &nbsp;&nbsp;&nbsp;&nbsp;tbody    | tbody class, follow [Vue Class Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;row      | tbody/tr class, follow [Vue Class Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;cell     | tbody/tr/td class, follow [Vue Class Bindings]
-| styles                           | Define component style
-| &nbsp;&nbsp;&nbsp;&nbsp;thead    | thead sub-component styles, follow [simter-vue-thead] `styles`  prop
-| &nbsp;&nbsp;&nbsp;&nbsp;tbody    | tbody style, follow [Vue Style Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;row      | tbody/tr style, follow [Vue Style Bindings]
-| &nbsp;&nbsp;&nbsp;&nbsp;cell     | tbody/tr/td style, follow [Vue Style Bindings]
+| Name_________ | Require | ValueType    | Description
+|---------------|---------|--------------|-------------
+| columns       | true    | \[{}\]       | Define table columns
+| ├ id          | false   | String       | The column's id, it's the key in the `rows` item
+| ├ label       | true    | String       | The column's visible text
+| ├ width       | false   | String       | The column's width, such as `'2em'`
+| ├ children    | false   | \[{}\]       | The child group columns. `id` and `width` will be ignored if define this property
+| ├ headerClass | false   | String       | This column's `thead/tr/th` element class, follow [Vue Class Bindings]
+| ├ headerStyle | false   | String       | This column's `thead/tr/th` element style, follow [Vue Class Bindings]
+| ├ class       | false   | String       | This column's `tbody/tr/td` element class, follow [Vue Class Bindings]
+| ├ style       | false   | String       | This column's `tbody/tr/td` element style, follow [Vue Class Bindings]
+| ├ cell        | false   | {}<br>String | Define cell customized, `String` type means setting `component` value
+| │ ├ component | false   | String       | The cell component's name
+| │ ├ classes   | false   | {}           | Define the cell's inner dom elements classes, keys is up to the component design
+| │ ├ styles    | false   | {}           | Define the cell's inner dom elements styles, keys is up to the component design
+| │ ├ ...custom | false   | custom       | The custom properties for all this column's cell component. It is up to the component design
+| rows          | true    | \[{}\]       | The table's row data
+| classes       | false   | {}           | Define inner dom elements global classes
+| ├ headerRow   | false   | String       | thead/tr class, follow [Vue Class Bindings]
+| ├ headerCell  | false   | String       | thead/tr/td class, follow [Vue Class Bindings]
+| ├ row         | false   | String       | tbody/tr class, follow [Vue Class Bindings]
+| ├ cell        | false   | String       | tbody/tr/td class, follow [Vue Class Bindings]
+| ├ groupRow    | false   | String       | group tbody/tr class, follow [Vue Class Bindings]
+| ├ groupCell   | false   | String       | group tbody/tr/td class, follow [Vue Class Bindings]
+| ├ table       | false   | String       | table class, follow [Vue Class Bindings]
+| ├ thead       | false   | String       | thead class, follow [Vue Class Bindings]
+| ├ tbody       | false   | String       | tbody class, follow [Vue Class Bindings]
+| styles        | false   | {}           | Define inner dom elements global styles, simular to `classes` prop
+| group         | false   | {}<br>String<br>Boolean<br>Function | Define how to predicate a group row. <br>`String` type means setting `id` value with `predicate=true`. <br>`Boolean` or `Function` type means setting `predicate` value with `id='group'`.
+| ├ id          | false   | String                   | The key in the row item to get the group cell value
+| ├ predicate   | false   | String<br>Function       | Generate a bool value to predicate whether this row is a group row<br>- String: The row item's key that to get the  bool value<br>- Function: Call to get the bool value. It's first param is the current row data
+| ├ indent      | false   | Boolean<br>String        | Predicate whether to indent children row or not. Default is true. <br>`String` type means setting a specific indent style, such as `padding-left:2em`
+| ├ cell        | false   | {}<br>String             | The group cell component config, same as `columns[i].cell`
+| ├ colspan     | false   | Number                   | The group cell's colspan attribute value. Default behavior is to merge all the column cell
+| picker        | false   | {}<br>String<br>Boolean  | Define the picker column cell. <br>`String` type means setting `component` value. <br>`Boolean` type means whether to show a default picker cell column.
+| ├ id          | false   | String                   | The key in the row item to get the picked value
+| ├ component   | false   | String       | The cell component's name
+| ├ classes     | false   | {}           | Define the picker cell's inner dom elements classes, keys is up to the component design
+| ├ styles      | false   | {}           | Define the picker cell's inner dom elements styles, keys is up to the component design
+| ├ ...custom   | false   | custom       | The custom properties for this picker cell component. It is up to the component design
+| id            | false   | String       | The key in row item that use its value to unique table row identity
 
 [simter-vue-thead]: https://github.com/simter/simter-vue-thead
 [Vue Class Bindings]: https://vuejs.org/v2/guide/class-and-style.html
@@ -35,7 +57,7 @@ Options:
 
 ```
 yarn install  // or npm install
-npm run dev
+yarn run dev  // or npm run dev
 ```
 
 Use [parcel] to run the development debug.
@@ -43,7 +65,7 @@ Use [parcel] to run the development debug.
 ## Build
 
 ```
-npm run build
+yarn run build  // or npm run build
 ```
 
 Use [rollup] package the component to `dist` directory.
