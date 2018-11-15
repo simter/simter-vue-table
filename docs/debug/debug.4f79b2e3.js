@@ -44,4 +44,4 @@ var t=arguments[3];Object.defineProperty(exports,"__esModule",{value:!0}),export
 },{"../src/table.vue":"c001"}],"Focm":[function(require,module,exports) {
 "use strict";var e=l(require("vue")),u=l(require("./example1.vue")),r=l(require("./example2.vue")),n=l(require("./example3.vue"));function l(e){return e&&e.__esModule?e:{default:e}}new e.default({el:"#sample1",render:function(e){return e(u.default)}}),new e.default({el:"#sample2",render:function(e){return e(r.default)}}),new e.default({el:"#sample3",render:function(e){return e(n.default)}});
 },{"vue":"QPfz","./example1.vue":"EAB/","./example2.vue":"Lhib","./example3.vue":"ijTG"}]},{},["Focm"], null)
-//# sourceMappingURL=/debug.4f79b2e3.map
+//# sourceMappingURL=//www.simter.tech/simter-vue-table/debug/debug.4f79b2e3.map
