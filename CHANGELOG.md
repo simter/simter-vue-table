@@ -1,5 +1,9 @@
 # simter-vue-table changelog
 
+## 0.6.0 2018-11-15
+
+- Refactor group feature
+
 ## 0.5.0 2018-11-02
 
 - Add group support

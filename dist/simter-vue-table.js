@@ -1,13 +1,13 @@
 /*!
-* simter-vue-table v0.5.0
+* simter-vue-table v0.6.0
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global['simter-vue-table'] = factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global['simter-vue-table'] = {})));
+}(this, (function (exports) { 'use strict';
 
   /*!
   * simter-vue-colgroup v0.3.0
@@ -123,7 +123,7 @@
     );
 
   /*!
-  * simter-vue-thead v0.3.2
+  * simter-vue-thead v0.4.2
   * @author RJ.Hwang <rongjihuang@gmail.com>
   * @license MIT
   */
@@ -425,16 +425,16 @@
           "tr",
           {
             key: "row-" + rowIndex,
-            class: _vm.$_classes.tr,
-            style: _vm.$_styles.tr
+            class: _vm.$_classes.row,
+            style: _vm.$_styles.row
           },
           _vm._l(row, function(cell, cellIndex) {
             return _c(
               "th",
               {
                 key: "cell-" + cellIndex,
-                class: cell.class || _vm.$_classes.th,
-                style: cell.style || _vm.$_styles.th,
+                class: [_vm.$_classes.cell, cell.headerClass],
+                style: [_vm.$_styles.cell, cell.headerStyle],
                 attrs: { colspan: cell.colspan, rowspan: cell.rowspan }
               },
               [_vm._v(_vm._s(cell.label || cell))]
@@ -537,7 +537,7 @@
    *   {rowIndex: 9, id: 'd', rows: []}
    * ]
    */
-  function groupRows (rows, group) {
+  function group (rows, group) {
     const groupKey = group.prop;
     const gi = {}; // {gN: index, ...}
     let rowIndex = -1;
@@ -573,68 +573,78 @@
 
   var cellBase = {
     props: {
-      // column
-      columnIndex: { type: Number, required: true },
-      column: { type: Object, required: true },
-
-      // row
-      rowIndex: { type: Number, required: true },
+      /**
+       * The cell's id. 
+       * Mostly use to record column.id for write back new value to origin row's data.
+       */
+      id: { type: [Number, String], required: false },
+      /** The cell's index */
+      cellIndex: { type: Number, required: true },
+      /** cell backend value */
+      value: { required: true },
+      /** 
+       * The belong row of this cell.
+       * row: {value, rowIndex, index, group}
+       * 1. row.group - {value, rowIndex, index}, the upper
+       * 2. row.value - the origin row data
+       * 3. row.rowIndex - the rowIndex in the table
+       * 4. row.index - the array index in the origin rows or row.children
+       * 
+       * If the row has no upper belong group-row, there will be no group property.
+       */
       row: { type: Object, required: true },
 
-      // groupRow
-      groupRow: { type: Object, required: false }
+      // control each descendant dom element class
+      classes: { type: Object, required: false, default() { return {} } },
+
+      // control each descendant dom element style
+      styles: { type: Object, required: false, default() { return {} } },
+
+      // a render function to convert cell's value to a visable label
+      render: { type: Function, required: false },
+
+      // wherther to mutate the origin row's value if this is a editable cell
+      mutate: { type: Boolean, required: false, default: false }
     },
     computed: {
-      // cell config by column
-      cfg() {
-        return this.column.cell || {};
-      },
-      // cell backend value
-      value() {
-        return this.row[this.column.id];
-      },
-      // cell frontend content, text or html
-      content() {
-        return this.cfg.render
+      /** cell frontend content, text or html */
+      label() {
+        return this.render
           // render(value, row)
           // can get more component instance data from `this`
-          ? this.cfg.render.call(this, this.value, this.row)
+          ? this.render.call(this, this.value, this.row.value)
           // origin value
           : this.value;
       },
-      // zero base RC string, such as '[1, 3]'
+      /** 
+       * zero base global RC string, such as '[1, 3]'.
+       * Not include picker column.
+       */
       rc() {
-        return `[${this.rowIndex}, ${this.columnIndex}]`;
-      },
-      // control each descendant dom element class
-      classes() {
-        return this.cfg.classes || {};
-      },
-      // control each descendant dom element style
-      styles() {
-        return this.cfg.styles || {};
+        return `[${this.row.rowIndex}, ${this.cellIndex}]`;
       }
     },
     methods: {
-      /** Accept the cell value change and emit cell-change event */
-      acceptChange(prop, newValue, oldValue, target) {
-        if (newValue != oldValue) {
-          // console.log("acceptChange %s: newValue=%s, oldValue=%s", this.rc, newValue, oldValue);
+      /** Accept the cell value change and emit change event */
+      acceptChange(mutate, newValue, oldValue, target) {
+        if (newValue == oldValue) return;
+        // console.log("acceptChange %s: id=%s, mutate=%s, newValu=%s, oldValue=%s", this.rc, this.id, mutate, newValue, oldValue);
 
-          // update the row data
-          this.$set(this.row, prop, newValue);
-
-          // emit cell change event
-          const data = {
-            newValue, oldValue,
-            columnIndex: this.columnIndex,
-            column: this.column,
-            rowIndex: this.rowIndex,
-            row: this.row
-          };
-          if (target) data.target = target;
-          this.$emit("cell-change", data);
+        // update the origin row data
+        if (mutate && this.id) {
+          //console.log("mutate the origin row data for '%s'", this.id)
+          this.$set(this.row.value, this.id, newValue);
         }
+
+        // emit change event
+        const data = {
+          newValue, oldValue,
+          cellIndex: this.cellIndex,
+          row: this.row
+        };
+        if (this.id) data.id = this.id;
+        if (mutate) data.mutate = mutate;
+        this.$emit("change", data);
       }
     }
   };
@@ -650,7 +660,7 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("span", [_vm._v(_vm._s(_vm.content))])
+    return _c("span", [_vm._v(_vm._s(_vm.label))])
   };
   var __vue_staticRenderFns__$2 = [];
   __vue_render__$2._withStripped = true;
@@ -714,7 +724,7 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { domProps: { innerHTML: _vm._s(_vm.content) } })
+    return _c("div", { domProps: { innerHTML: _vm._s(_vm.label) } })
   };
   var __vue_staticRenderFns__$3 = [];
   __vue_render__$3._withStripped = true;
@@ -770,19 +780,38 @@
   //
   var script$2 = {
     extends: cellBase,
-    computed: {
-      // the prop name that holds the picker status value
-      pickedProp() {
-        return this.cfg.pickedProp || this.$parent.pickedProp || this.column.id || 'picked';
-      },
-      // the picker status
-      picked: {
-        get() {
-          return this.row[this.pickedProp];
-        },
-        set(value) {
-          this.acceptChange(this.pickedProp, value, !value, this.$el.firstElementChild);
+    props: {
+      isGroupPicker: { type: Boolean, required: false, default: false },
+      showNumber: { type: Boolean, required: false, default: true },
+      showPicker: { type: Boolean, required: false, default: true }
+    },
+    data() {
+      return { picked: false };
+    },
+    created() {
+      // init the picked value
+      if (this.id) this.picked = this.row.value[this.id];
+    },
+    methods: {
+      pickedEvent() {
+        if (this.isGroupPicker) {
+          // pick all the children row
+          this.$parent.$refs.rowPicker
+            .filter(
+              t => t.row.group && t.row.group.rowIndex === this.row.rowIndex
+            )
+            .forEach(t => {
+              if (t.picked != this.picked) t.picked = this.picked;
+            });
+        } else if (this.row.group && !this.picked) {
+          // unpick group row's picker if it is picked
+          this.$parent.$refs.groupRowPicker
+            .filter(t => t.row.rowIndex === this.row.group.rowIndex)
+            .forEach(t => t.picked && (t.picked = false));
         }
+
+        // emit pick event
+        this.$emit("pick", { picked: this.picked, row: this.row });
       }
     }
   };
@@ -797,61 +826,67 @@
     var _c = _vm._self._c || _h;
     return _c(
       "label",
-      { class: ["row-picker", _vm.classes.label], style: _vm.styles.label },
+      {
+        class: ["row-picker", _vm.classes.container],
+        style: _vm.styles.container
+      },
       [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.picked,
-              expression: "picked"
-            }
-          ],
-          class: _vm.classes.input,
-          style: _vm.styles.input,
-          attrs: { type: "checkbox" },
-          domProps: {
-            checked: Array.isArray(_vm.picked)
-              ? _vm._i(_vm.picked, null) > -1
-              : _vm.picked
-          },
-          on: {
-            change: function($event) {
-              var $$a = _vm.picked,
-                $$el = $event.target,
-                $$c = $$el.checked ? true : false;
-              if (Array.isArray($$a)) {
-                var $$v = null,
-                  $$i = _vm._i($$a, $$v);
-                if ($$el.checked) {
-                  $$i < 0 && (_vm.picked = $$a.concat([$$v]));
-                } else {
-                  $$i > -1 &&
-                    (_vm.picked = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+        _vm.showPicker
+          ? _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.picked,
+                  expression: "picked"
                 }
-              } else {
-                _vm.picked = $$c;
+              ],
+              class: _vm.classes.picker,
+              style: _vm.styles.picker,
+              attrs: { type: "checkbox" },
+              domProps: {
+                checked: Array.isArray(_vm.picked)
+                  ? _vm._i(_vm.picked, null) > -1
+                  : _vm.picked
+              },
+              on: {
+                change: [
+                  function($event) {
+                    var $$a = _vm.picked,
+                      $$el = $event.target,
+                      $$c = $$el.checked ? true : false;
+                    if (Array.isArray($$a)) {
+                      var $$v = null,
+                        $$i = _vm._i($$a, $$v);
+                      if ($$el.checked) {
+                        $$i < 0 && (_vm.picked = $$a.concat([$$v]));
+                      } else {
+                        $$i > -1 &&
+                          (_vm.picked = $$a
+                            .slice(0, $$i)
+                            .concat($$a.slice($$i + 1)));
+                      }
+                    } else {
+                      _vm.picked = $$c;
+                    }
+                  },
+                  function($event) {
+                    $event.stopPropagation();
+                    return _vm.pickedEvent($event)
+                  }
+                ]
               }
-            }
-          }
-        }),
-        _vm._v(" "),
-        _vm.cfg.showRowNumber
-          ? _c("span", { class: _vm.classes.span, style: _vm.styles.span }, [
-              _vm._v(
-                _vm._s(
-                  _vm.groupRow
-                    ? _vm.rowIndex - _vm.groupRow.rowIndex
-                    : _vm.rowIndex + 1
-                )
-              )
-            ])
+            })
           : _vm._e(),
         _vm._v(" "),
-        _vm.cfg.showContent
-          ? _c("span", { class: _vm.classes.span, style: _vm.styles.span }, [
-              _vm._v(_vm._s(_vm.content))
+        _vm.showNumber
+          ? _c("span", { class: _vm.classes.number, style: _vm.styles.number }, [
+              _vm._v(
+                _vm._s(
+                  (_vm.row.group ? _vm.row.group.index + 1 + "-" : "") +
+                    (_vm.row.index + 1)
+                )
+              )
             ])
           : _vm._e()
       ]
@@ -909,14 +944,7 @@
     );
 
   //
-  var script$3 = {
-    extends: cellBase,
-    methods: {
-      cancelChange($event) {
-        $event.target.value = this.value;
-      }
-    }
-  };
+  var script$3 = { extends: cellBase };
 
   /* script */
               const __vue_script__$5 = script$3;
@@ -926,40 +954,7 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("input", {
-      class: ["text-editor", _vm.classes.input],
-      style: _vm.styles.input,
-      attrs: { type: "text" },
-      domProps: { value: _vm.value },
-      on: {
-        keyup: [
-          function($event) {
-            if (
-              !("button" in $event) &&
-              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-            ) {
-              return null
-            }
-            _vm.acceptChange(
-              _vm.column.id,
-              $event.target.value,
-              _vm.value,
-              $event.target
-            );
-          },
-          function($event) {
-            if (
-              !("button" in $event) &&
-              _vm._k($event.keyCode, "esc", 27, $event.key, "Escape")
-            ) {
-              return null
-            }
-            return _vm.cancelChange($event)
-          }
-        ],
-        blur: _vm.cancelChange
-      }
-    })
+    return _c("span", [_vm._v(_vm._s(_vm.rowIndex + 1))])
   };
   var __vue_staticRenderFns__$5 = [];
   __vue_render__$5._withStripped = true;
@@ -981,7 +976,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\text-editor.vue";
+      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\row-number.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -1001,7 +996,7 @@
     
 
     
-    var cellTextEditor = __vue_normalize__$5(
+    var cellRowNumber = __vue_normalize__$5(
       { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
       __vue_inject_styles__$5,
       __vue_script__$5,
@@ -1015,6 +1010,13 @@
   //
   var script$4 = {
     extends: cellBase,
+    data() {
+      return { text: null };
+    },
+    created() {
+      // init the text value
+      this.text = this.value;
+    },
     methods: {
       cancelChange($event) {
         $event.target.value = this.value;
@@ -1031,10 +1033,10 @@
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
     return _c("input", {
-      class: ["number-editor", _vm.classes.input],
-      style: _vm.styles.input,
-      attrs: { type: "number" },
-      domProps: { value: _vm.value },
+      class: ["text-editor", _vm.classes.text],
+      style: _vm.styles.text,
+      attrs: { type: "text" },
+      domProps: { value: _vm.text },
       on: {
         keyup: [
           function($event) {
@@ -1045,7 +1047,7 @@
               return null
             }
             _vm.acceptChange(
-              _vm.column.id,
+              _vm.mutate,
               $event.target.value,
               _vm.value,
               $event.target
@@ -1085,6 +1087,117 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
+      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\text-editor.vue";
+
+      if (!component.render) {
+        component.render = template.render;
+        component.staticRenderFns = template.staticRenderFns;
+        component._compiled = true;
+
+        if (functional) component.functional = true;
+      }
+
+      component._scopeId = scope;
+
+      return component
+    }
+    /* style inject */
+    
+    /* style inject SSR */
+    
+
+    
+    var cellTextEditor = __vue_normalize__$6(
+      { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+      __vue_inject_styles__$6,
+      __vue_script__$6,
+      __vue_scope_id__$6,
+      __vue_is_functional_template__$6,
+      __vue_module_identifier__$6,
+      undefined,
+      undefined
+    );
+
+  //
+  var script$5 = {
+    extends: cellBase,
+    data() {
+      return { num: null };
+    },
+    created() {
+      // init the text value
+      this.num = this.value;
+    },
+    methods: {
+      cancelChange($event) {
+        $event.target.value = this.value;
+      }
+    }
+  };
+
+  /* script */
+              const __vue_script__$7 = script$5;
+              
+  /* template */
+  var __vue_render__$7 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("input", {
+      class: ["number-editor", _vm.classes.number],
+      style: _vm.styles.number,
+      attrs: { type: "number" },
+      domProps: { value: _vm.num },
+      on: {
+        keyup: [
+          function($event) {
+            if (
+              !("button" in $event) &&
+              _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+            ) {
+              return null
+            }
+            _vm.acceptChange(
+              _vm.mutate,
+              $event.target.value,
+              _vm.value,
+              $event.target
+            );
+          },
+          function($event) {
+            if (
+              !("button" in $event) &&
+              _vm._k($event.keyCode, "esc", 27, $event.key, "Escape")
+            ) {
+              return null
+            }
+            return _vm.cancelChange($event)
+          }
+        ],
+        blur: _vm.cancelChange
+      }
+    })
+  };
+  var __vue_staticRenderFns__$7 = [];
+  __vue_render__$7._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$7 = undefined;
+    /* scoped */
+    const __vue_scope_id__$7 = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$7 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$7 = false;
+    /* component normalizer */
+    function __vue_normalize__$7(
+      template, style, script,
+      scope, functional, moduleIdentifier,
+      createInjector, createInjectorSSR
+    ) {
+      const component = (typeof script === 'function' ? script.options : script) || {};
+
+      // For security concerns, we use only base name in production mode.
       component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\number-editor.vue";
 
       if (!component.render) {
@@ -1105,13 +1218,13 @@
     
 
     
-    var cellNumberEditor = __vue_normalize__$6(
-      { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
-      __vue_inject_styles__$6,
-      __vue_script__$6,
-      __vue_scope_id__$6,
-      __vue_is_functional_template__$6,
-      __vue_module_identifier__$6,
+    var cellNumberEditor = __vue_normalize__$7(
+      { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
+      __vue_inject_styles__$7,
+      __vue_script__$7,
+      __vue_scope_id__$7,
+      __vue_is_functional_template__$7,
+      __vue_module_identifier__$7,
       undefined,
       undefined
     );
@@ -1120,8 +1233,7 @@
 
   const component$2 = {
     props: {
-      idProp: { type: String, required: false, default: "id" },
-      pickedProp: { type: String, required: false, default: "picked" },
+      // predicate whether to generate the thead element
       withoutThead: { type: Boolean, required: false, default: false },
       columns: { type: Array, required: true },
       rows: {
@@ -1145,29 +1257,76 @@
           return {};
         }
       },
-      group: { type: [String, Object], required: false }
+      group: { type: [String, Object], required: false },
+      picker: { type: [Boolean, String, Object], required: false, default: false },
+      id: { type: String, required: false }
+    },
+    data() {
+      return { rowsExt: [], selection: [] };
+    },
+    created() {
+      this.generateRowsHelper();
     },
     computed: {
       /**
        * The result of function call flatten(this.columns).
        * It gather all columns leaf to return.
        */
-      $_columnsLeaf() {
+      $_flattenColumns() {
         return flatten$1(this.columns);
+      },
+      /** The header columns */
+      $_headerColumns() {
+        if (this.$_picker)
+          return [
+            {
+              label: this.$_picker.label || " ",
+              width: this.$_picker.width
+            }
+          ].concat(this.columns);
+        else return this.columns;
+      },
+      /** Polishing the `picker` config to a standard Object format */
+      $_picker() {
+        return typeof this.picker === "string"
+          ? { component: this.picker }
+          : this.picker === true
+            ? { component: "st-cell-row-picker" }
+            : this.picker;
       },
       /** Polishing the `group` config to a standard Object format */
       $_group() {
-        return typeof this.group === "string" ? { prop: this.group } : this.group;
+        if (this.group == null) return { predicate: false };
+        else if (typeof this.group === "string")
+          return { id: this.group, predicate: true, indent: true };
+        else if (
+          typeof this.group === "function" ||
+          typeof this.group === "boolean"
+        )
+          return { id: "group", predicate: this.group, indent: true };
+        else return this.group;
       },
-      /** Group the rows by the `group` prop config */
-      $_groupedRows() {
-        if (!this.$_group) return null;
-        return groupRows(this.rows, this.$_group);
+      /** Filter all cell event listeners by prefix 'cell-' */
+      $_cellEventListeners() {
+        const cl = {};
+        Object.keys(this.$listeners)
+          .filter(key => key.startsWith("cell-"))
+          .forEach(key => {
+            cl[key.substr(5)] = this.$listeners[key];
+          });
+        //console.log("cellEventListeners=%s", Object.keys(cl).join(", "));
+        return cl;
       },
-      /** Collect all the selected row by the `pickedProp`'s boolean value */
-      selection() {
-        if (!this.rows) return [];
-        else return this.rows.filter(r => r[this.pickedProp]);
+      /** Filter all row event listeners by prefix 'row-' */
+      $_rowEventListeners() {
+        const cl = {};
+        Object.keys(this.$listeners)
+          .filter(key => key.startsWith("row-"))
+          .forEach(key => {
+            cl[key.substr(4)] = this.$listeners[key];
+          });
+        //console.log("rowEventListeners=%o", cl);
+        return cl;
       }
     },
     components: {
@@ -1177,6 +1336,7 @@
       "st-cell-text": cellText,
       "st-cell-html": cellHtml,
       "st-cell-row-picker": cellRowPicker,
+      "st-cell-row-number": cellRowNumber,
       "st-cell-text-editor": cellTextEditor,
       "st-cell-number-editor": cellNumberEditor
     },
@@ -1197,46 +1357,134 @@
           );
         }
       },
-      reemitCellChangeEvent($event) {
-        // console.log("in table: newValue=%s, oldValue=%s", $event.newValue, $event.oldValue);
-
-        // reemit cell-change event
-        this.$emit("cell-change", $event);
+      /** Predicate whether this row is a group row */
+      $_isGroupRow(row) {
+        if (typeof this.$_group.predicate === "function")
+          return this.$_group.predicate.call(this, row);
+        else if (typeof this.$_group.predicate === "boolean")
+          return this.$_group.predicate;
+        else return row(this.$_group.predicate);
+      },
+      $_rowPickEvent($event) {
+        if ($event.picked) this.selection.push($event.row);
+        else {
+          const index = this.selection.indexOf($event.row);
+          if (index > -1) this.selection.splice(index, 1);
+        }
       },
       deleteSelection() {
-        this.selection.forEach(r =>
-          this.$delete(this.rows, this.rows.indexOf(r))
-        );
+        // 逆序排序
+        const toRemove = this.selection.sort((r1, r2) => {
+          if (!r1.group && !r2.group) {
+            // 同为 1 级节点
+            return r2.index - r1.index;
+          } else if (r1.group && r2.group) {
+            // 同为 2 级节点
+            const d = r2.group.index - r1.group.index;
+            return d == 0 ? r2.index - r1.index : d;
+          } else if (r1.group && !r2.group) {
+            // 1 级节点与 2 级节点
+            return r2.index - r1.group.index;
+          } else {
+            // 2 级节点与 1 级节点
+            return r2.group.index - r1.index;
+          }
+        });
+
+        // 逆向从数组中删除元素
+        toRemove.forEach(row => {
+          if (row.group) {
+            this.$delete(this.rows[row.group.index].children, row.index);
+          } else this.$delete(this.rows, row.index);
+        });
+        this.selection = [];
+      },
+      generateRowsHelper() {
+        // generate rows helper to save some specific data.
+        // It has a same length with rows
+        // [{value, index, rowIndex, children}, ...]
+        const helper = [];
+        let nextRowIndex = 0;
+        this.rows.forEach((row, i) => {
+          const _row = {
+            value: row,
+            index: i,
+            rowIndex: nextRowIndex++,
+            isGroupRow: this.$_isGroupRow(row)
+          };
+          helper.push(_row);
+          if (_row.isGroupRow) {
+            _row.children = [];
+            row.children.forEach((crow, j) => {
+              const _crow = {
+                value: crow,
+                index: j,
+                rowIndex: nextRowIndex++,
+                group: _row
+              };
+              _row.children.push(_crow);
+            });
+          }
+        });
+        this.rowsExt = helper;
       }
     },
     watch: {
-      selection(newValue, oldValue) {
-        this.$emit("selection-change", newValue, oldValue);
+      rows: {
+        deep: true,
+        handler() {
+          //console.log("st-table : rows change");
+          this.generateRowsHelper();
+        }
+      },
+      group: {
+        deep: true,
+        handler() {
+          //console.log("st-table : group change");
+          this.generateRowsHelper();
+        }
+      },
+      selection(value) {
+        // 1. first param is the origin leaf row data.
+        // 2. second param is [{value, rowIndex, index, group}, ...], value is the origin leaf row data, all defined in cellBase.
+        if ("selection-change" in this.$listeners)
+          this.$emit("selection-change", value.map(v => v.value), value);
       }
     }
   };
 
   /* script */
-              const __vue_script__$7 = component$2;
+              const __vue_script__$8 = component$2;
               
   /* template */
-  var __vue_render__$7 = function() {
+  var __vue_render__$8 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
     return _c(
       "table",
-      { class: ["st-table", _vm.classes.table], style: _vm.styles.root },
+      { class: ["st-table", _vm.classes.table], style: _vm.styles.table },
       [
-        _c("st-colgroup", { tag: "colgroup", attrs: { columns: _vm.columns } }),
+        _c("st-colgroup", {
+          tag: "colgroup",
+          attrs: { columns: _vm.$_headerColumns }
+        }),
         _vm._v(" "),
         !_vm.withoutThead
           ? _c("st-thead", {
               tag: "thead",
               attrs: {
-                columns: _vm.columns,
-                classes: _vm.classes.thead,
-                styles: _vm.styles.thead
+                columns: _vm.$_headerColumns,
+                classes: {
+                  thead: _vm.classes.thead,
+                  row: _vm.classes.headerRow,
+                  cell: _vm.classes.headerCell
+                },
+                styles: {
+                  thead: _vm.styles.thead,
+                  row: _vm.styles.headerRow,
+                  cell: _vm.styles.headerCell
+                }
               }
             })
           : _vm._e(),
@@ -1245,161 +1493,332 @@
           "tbody",
           { class: _vm.classes.tbody, style: _vm.styles.tbody },
           [
-            _vm._l(_vm.$_groupedRows, function(groupRow) {
-              return _vm.group
-                ? [
-                    _c(
-                      "tr",
-                      {
-                        key: groupRow.rowIndex,
-                        class: ["st-group-row", _vm.classes.groupRow],
-                        style: _vm.styles.groupRow
-                      },
-                      [
-                        _c(
-                          "td",
-                          {
-                            class: ["st-group-cell", _vm.classes.groupCell],
-                            style: _vm.styles.groupCell,
-                            attrs: { colspan: _vm.$_columnsLeaf.length }
-                          },
-                          [
-                            _c(_vm.$_getCellComponent(_vm.$_group), {
-                              tag: "component",
-                              attrs: {
-                                "column-index": 0,
-                                column: { id: "id", cell: _vm.$_group.cell },
-                                "row-index": groupRow.rowIndex,
-                                row: groupRow
-                              },
-                              on: { "cell-change": _vm.reemitCellChangeEvent }
-                            })
-                          ],
-                          1
-                        )
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _vm._l(groupRow.rows, function(row, rowIndex) {
-                      return _c(
+            _vm._l(_vm.rowsExt, function(row) {
+              return [
+                row.isGroupRow
+                  ? [
+                      _c(
                         "tr",
                         {
-                          key: groupRow.rowIndex + rowIndex + 1,
-                          class: ["st-row", _vm.classes.row],
-                          style: _vm.styles.row
+                          key: _vm.id ? row.value[_vm.id] : row.rowIndex,
+                          class: ["st-group-row", _vm.classes.groupRow],
+                          style: _vm.styles.groupRow
                         },
-                        _vm._l(_vm.$_columnsLeaf, function(column, columnIndex) {
-                          return _c(
+                        [
+                          _vm.$_picker
+                            ? _c(
+                                "td",
+                                {
+                                  class: [
+                                    "st-group-cell st-row-picker",
+                                    _vm.classes.groupCell
+                                  ],
+                                  style: _vm.styles.groupCell
+                                },
+                                [
+                                  _c(
+                                    _vm.$_picker.component,
+                                    _vm._g(
+                                      _vm._b(
+                                        {
+                                          ref: "groupRowPicker",
+                                          refInFor: true,
+                                          tag: "component",
+                                          on: { pick: _vm.$_rowPickEvent }
+                                        },
+                                        "component",
+                                        Object.assign(
+                                          {
+                                            cellIndex: 0,
+                                            value: _vm.$_picker.id
+                                              ? row.value[_vm.$_picker.id]
+                                              : null,
+                                            row: row,
+                                            isGroupPicker: true
+                                          },
+                                          _vm.$_picker
+                                        ),
+                                        false
+                                      ),
+                                      _vm.$_rowEventListeners
+                                    )
+                                  )
+                                ],
+                                1
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c(
                             "td",
                             {
-                              key: column.id,
-                              class: ["st-cell", _vm.classes.cell],
-                              style: _vm.styles.cell,
-                              on: {
-                                click: function($event) {
-                                  $event.stopPropagation();
-                                  _vm.$emit("cell-click", {
-                                    rowIndex: rowIndex,
-                                    row: row,
-                                    columnIndex: columnIndex,
-                                    column: column,
-                                    row: row,
-                                    column: column,
-                                    target: $event.target
-                                  });
-                                }
+                              class: ["st-group-cell", _vm.classes.groupCell],
+                              style: _vm.styles.groupCell,
+                              attrs: {
+                                colspan:
+                                  _vm.$_group.colspan ||
+                                  _vm.$_flattenColumns.length
                               }
                             },
                             [
-                              _c(_vm.$_getCellComponent(column), {
-                                tag: "component",
-                                attrs: {
-                                  "column-index": columnIndex,
-                                  column: column,
-                                  "row-index": groupRow.rowIndex + rowIndex + 1,
-                                  row: row,
-                                  "group-row": groupRow
-                                },
-                                on: { "cell-change": _vm.reemitCellChangeEvent }
-                              })
+                              _c(
+                                _vm.$_getCellComponent(_vm.$_group),
+                                _vm._g(
+                                  _vm._b(
+                                    { tag: "component" },
+                                    "component",
+                                    Object.assign(
+                                      {
+                                        id: _vm.$_group.id,
+                                        cellIndex: 0,
+                                        value: row.value[_vm.$_group.id],
+                                        row: row
+                                      },
+                                      _vm.$_group.cell
+                                    ),
+                                    false
+                                  ),
+                                  _vm.$_cellEventListeners
+                                )
+                              )
                             ],
                             1
-                          )
-                        })
-                      )
-                    })
-                  ]
-                : _vm._e()
-            }),
-            _vm._v(" "),
-            !_vm.group
-              ? _vm._l(_vm.rows, function(row, rowIndex) {
-                  return _c(
-                    "tr",
-                    {
-                      key: row[_vm.idProp] || rowIndex,
-                      class: ["st-row", _vm.classes.row],
-                      style: _vm.styles.row
-                    },
-                    _vm._l(_vm.$_columnsLeaf, function(column, columnIndex) {
-                      return _c(
-                        "td",
+                          ),
+                          _vm._v(" "),
+                          _vm.$_group.colspan &&
+                          _vm.$_flattenColumns.length - _vm.$_group.colspan > 0
+                            ? _c("td", {
+                                class: ["st-group-cell", _vm.classes.groupCell],
+                                style: _vm.styles.groupCell,
+                                attrs: {
+                                  colspan:
+                                    _vm.$_flattenColumns.length -
+                                    _vm.$_group.colspan
+                                }
+                              })
+                            : _vm._e()
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _vm._l(row.children, function(crow) {
+                        return _c(
+                          "tr",
+                          {
+                            key: _vm.id
+                              ? crow.value[_vm.id]
+                              : crow.rowIndex + "-" + crow.rowIndex,
+                            class: ["st-row", _vm.classes.row],
+                            style: _vm.styles.row
+                          },
+                          [
+                            _vm.$_picker
+                              ? _c(
+                                  "td",
+                                  {
+                                    class: [
+                                      "st-cell st-row-picker",
+                                      _vm.classes.cell
+                                    ],
+                                    style: _vm.styles.cell
+                                  },
+                                  [
+                                    _c(
+                                      _vm.$_picker.component,
+                                      _vm._g(
+                                        _vm._b(
+                                          {
+                                            ref: "rowPicker",
+                                            refInFor: true,
+                                            tag: "component",
+                                            on: { pick: _vm.$_rowPickEvent }
+                                          },
+                                          "component",
+                                          Object.assign(
+                                            {
+                                              cellIndex: 0,
+                                              value: _vm.$_picker.id
+                                                ? crow.value[_vm.$_picker.id]
+                                                : null,
+                                              row: crow
+                                            },
+                                            _vm.$_picker
+                                          ),
+                                          false
+                                        ),
+                                        _vm.$_rowEventListeners
+                                      )
+                                    )
+                                  ],
+                                  1
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm._l(_vm.$_flattenColumns, function(
+                              column,
+                              columnIndex
+                            ) {
+                              return _c(
+                                "td",
+                                {
+                                  key: column.id,
+                                  class: [
+                                    "st-cell",
+                                    _vm.classes.cell,
+                                    column.class,
+                                    columnIndex === 0 &&
+                                    _vm.$_group.indent !== false
+                                      ? typeof _vm.$_group.indent === "string"
+                                        ? _vm.$_group.indent
+                                        : "st-indent"
+                                      : null
+                                  ],
+                                  style: [_vm.styles.cell, column.style]
+                                },
+                                [
+                                  _c(
+                                    _vm.$_getCellComponent(column),
+                                    _vm._g(
+                                      _vm._b(
+                                        { tag: "component" },
+                                        "component",
+                                        Object.assign(
+                                          {
+                                            id: column.id,
+                                            cellIndex: columnIndex,
+                                            value: crow.value[column.id],
+                                            row: crow
+                                          },
+                                          column.cell
+                                        ),
+                                        false
+                                      ),
+                                      _vm.$_cellEventListeners
+                                    )
+                                  )
+                                ],
+                                1
+                              )
+                            })
+                          ],
+                          2
+                        )
+                      })
+                    ]
+                  : [
+                      _c(
+                        "tr",
                         {
-                          key: column.id,
-                          class: ["st-cell", _vm.classes.cell],
-                          style: _vm.styles.cell,
-                          on: {
-                            click: function($event) {
-                              $event.stopPropagation();
-                              _vm.$emit("cell-click", {
-                                rowIndex: rowIndex,
-                                row: row,
-                                columnIndex: columnIndex,
-                                column: column,
-                                row: row,
-                                column: column,
-                                target: $event.target
-                              });
-                            }
-                          }
+                          key: _vm.id ? row.value[_vm.id] : row.rowIndex,
+                          class: ["st-row", _vm.classes.row],
+                          style: _vm.styles.row
                         },
                         [
-                          _c(_vm.$_getCellComponent(column), {
-                            tag: "component",
-                            attrs: {
-                              "column-index": columnIndex,
-                              column: column,
-                              "row-index": rowIndex,
-                              row: row
-                            },
-                            on: { "cell-change": _vm.reemitCellChangeEvent }
+                          _vm.$_picker
+                            ? _c(
+                                "td",
+                                {
+                                  class: [
+                                    "st-cell st-row-picker",
+                                    _vm.classes.cell
+                                  ],
+                                  style: _vm.styles.cell
+                                },
+                                [
+                                  _c(
+                                    _vm.$_picker.component,
+                                    _vm._g(
+                                      _vm._b(
+                                        {
+                                          ref: "rowPicker",
+                                          refInFor: true,
+                                          tag: "component",
+                                          on: { pick: _vm.$_rowPickEvent }
+                                        },
+                                        "component",
+                                        Object.assign(
+                                          {
+                                            cellIndex: 0,
+                                            value: _vm.$_picker.id
+                                              ? row.value[_vm.$_picker.id]
+                                              : null,
+                                            row: row
+                                          },
+                                          _vm.$_picker
+                                        ),
+                                        false
+                                      ),
+                                      _vm.$_rowEventListeners
+                                    )
+                                  )
+                                ],
+                                1
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm._l(_vm.$_flattenColumns, function(
+                            column,
+                            columnIndex
+                          ) {
+                            return _c(
+                              "td",
+                              {
+                                key: column.id,
+                                class: [
+                                  "st-cell",
+                                  _vm.classes.cell,
+                                  column.class
+                                ],
+                                style: [_vm.styles.cell, column.style]
+                              },
+                              [
+                                _c(
+                                  _vm.$_getCellComponent(column),
+                                  _vm._g(
+                                    _vm._b(
+                                      { tag: "component" },
+                                      "component",
+                                      Object.assign(
+                                        {
+                                          id: column.id,
+                                          cellIndex: columnIndex,
+                                          value: row.value[column.id],
+                                          row: row
+                                        },
+                                        column.cell
+                                      ),
+                                      false
+                                    ),
+                                    _vm.$_cellEventListeners
+                                  )
+                                )
+                              ],
+                              1
+                            )
                           })
                         ],
-                        1
+                        2
                       )
-                    })
-                  )
-                })
-              : _vm._e()
+                    ]
+              ]
+            })
           ],
           2
         )
       ]
     )
   };
-  var __vue_staticRenderFns__$7 = [];
-  __vue_render__$7._withStripped = true;
+  var __vue_staticRenderFns__$8 = [];
+  __vue_render__$8._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$7 = undefined;
+    const __vue_inject_styles__$8 = undefined;
     /* scoped */
-    const __vue_scope_id__$7 = undefined;
+    const __vue_scope_id__$8 = undefined;
     /* module identifier */
-    const __vue_module_identifier__$7 = undefined;
+    const __vue_module_identifier__$8 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$7 = false;
+    const __vue_is_functional_template__$8 = false;
     /* component normalizer */
-    function __vue_normalize__$7(
+    function __vue_normalize__$8(
       template, style, script,
       scope, functional, moduleIdentifier,
       createInjector, createInjectorSSR
@@ -1427,17 +1846,30 @@
     
 
     
-    var table = __vue_normalize__$7(
-      { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
-      __vue_inject_styles__$7,
-      __vue_script__$7,
-      __vue_scope_id__$7,
-      __vue_is_functional_template__$7,
-      __vue_module_identifier__$7,
+    var table = __vue_normalize__$8(
+      { render: __vue_render__$8, staticRenderFns: __vue_staticRenderFns__$8 },
+      __vue_inject_styles__$8,
+      __vue_script__$8,
+      __vue_scope_id__$8,
+      __vue_is_functional_template__$8,
+      __vue_module_identifier__$8,
       undefined,
       undefined
     );
 
-  return table;
+  exports.default = table;
+  exports.cellBase = cellBase;
+  exports.cellText = cellText;
+  exports.cellHtml = cellHtml;
+  exports.cellRowPicker = cellRowPicker;
+  exports.cellRowNumber = cellRowNumber;
+  exports.cellTextEditor = cellTextEditor;
+  exports.cellNumberEditor = cellNumberEditor;
+  exports.group = group;
+  exports.stTableColgroup = colgroup;
+  exports.stTableThead = thead;
+  exports.flatten = flatten$1;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table-integration-jquery-ui v0.5.0
+* simter-vue-table-integration-jquery-ui v0.6.0
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */
@@ -90,10 +90,8 @@
   // table's classes config
   const classes = {
     table: ["ui-widget-content"],
-    thead: {
-      tr: "st-row",
-      th: "st-cell"
-    }
+    headerRow: "st-row",
+    headerCell: "st-cell"
   };
 
   // inner cell component config
