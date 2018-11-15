@@ -59,25 +59,6 @@ export default {
     "st-table": table
   },
   computed: {
-    classes1() {
-      const t = {
-        table: "table",
-        thead: {
-          thead: "thead",
-          tr: "tr",
-          th: "th"
-        },
-        tbody: "tbody",
-        tr: "tr",
-        td: "td"
-      };
-
-      if (this.ui.borderedTable) {
-        t.thead.tr = t.tr += " ui-widget-content";
-      }
-
-      return t;
-    },
     styles() {
       const t = {
         table: {

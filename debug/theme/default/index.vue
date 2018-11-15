@@ -20,26 +20,31 @@
       <label><input type="checkbox" v-model="ui.showRowPicker"> Display row picker</label>
     </div>
     <div class="option">
-      <label><input type="checkbox" v-model="ui.groupable"> Groupable</label>
+      <label><input type="checkbox" v-model="ui.expandFolder"> Expand folder</label>
+      <span v-if="ui.expandFolder">
+        (colspan=<input type="number" v-model="ui.groupCellColspan" min="1" :max="columns.length">)
+      </span>
     </div>
     <div class="option">
-      <label><input type="checkbox" v-model="ui.editable"> Cell editable</label>
+      <label><input type="checkbox" v-model="ui.editable"> Editable</label>
     </div>
     <div class="option">
-      Table border width: <input type="number" v-model="ui.tableBorderWidth" min="0">
-    </div>
-    <div class="option">
-      Table style: <input type="checkbox" v-model="ui.tableBorderCollapse">'border-collapse: collapse'
+      Table : border=<input type="number" v-model="ui.tableBorderWidth" min="0" max="9">
+      <label><input type="checkbox" v-model="ui.tableBorderCollapse">border-collapse=collapse</label>
     </div>
   </div>
   <br>
   <div class="template">
-    <st-table ref="myTable" :columns="columns" :rows="rows"
-      :classes="classes" :group="group" picked-prop="picked"
-      :border="ui.tableBorderWidth" :style="ui.tableBorderCollapse ? 'border-collapse: collapse' : ''"
-      @cell-change="cellChange"
-      @cell-click="cellClick"
-      @selection-change="selectionChange">
+    <st-table ref="myTable" id="id"
+      :columns="columns" :rows="rows" :group="group"
+      :classes="classes" 
+      :styles="{table: ui.dark ? 'border-color: #fff' : 'border-color: #000'}"
+      :border="ui.tableBorderWidth"
+      :style="ui.tableBorderCollapse ? 'border-collapse: collapse' : ''"
+      :picker="picker"
+      @cell-change="cellChangeEvent"
+      @selection-change="selectionChangeEvent"
+      @row-pick="rowPickEvent">
     </st-table>
   </div>
   <div class="options" style="border: none" v-if="selectionNames">
@@ -59,58 +64,101 @@ export default {
         dark: true,
         showRowNumber: true,
         showRowPicker: true,
-        groupable: true,
-        editable: true,
+        expandFolder: true,
+        editable: false,
         tableBorderWidth: 1,
+        groupCellColspan: 4,
+        tableBorderCollapse: false,
         darkStyle: "background-color: #000; color: #fff;",
         lightStyle: "background-color: #fff; color: #000;"
       },
-      classes: {},
+      classes: {
+        headerRow: "st-header-row",
+        headerCell: "st-header-cell"
+      },
       rows: [
         {
           id: 11,
-          group: "Group1",
+          type: "file",
           name: "Live Photo 1",
           ext: "png",
           size: 100,
-          updater: "RJ",
-          updateTime: "2018-01-01 12:30"
+          modifier: "RJ",
+          modifyOn: "2018-01-01 12:30"
         },
         {
           id: 12,
-          group: "Group1",
+          type: "file",
           name: "Live Photo 2",
           ext: "jpg",
           size: 123 * 1024,
-          updater: "John",
-          updateTime: "2018-01-01 12:35"
+          modifier: "John",
+          modifyOn: "2018-01-01 12:35"
         },
         {
-          id: 21,
-          group: "Group2",
-          name: "Maintain Pic 1",
-          ext: "png",
-          size: 123.456 * 1024 * 1024,
-          updater: "John",
-          updateTime: "2018-01-01 12:30"
+          id: 20,
+          type: "folder",
+          name: "Folder 1",
+          children: [
+            {
+              id: 22,
+              type: "file",
+              name: "Maintain Pic 1",
+              ext: "jpg",
+              size: 123 * 1024 * 1024 * 1024,
+              modifier: "David",
+              modifyOn: "2018-01-01 12:40"
+            },
+            {
+              id: 23,
+              type: "file",
+              name: "Maintain Record",
+              ext: "docx",
+              size: 100 * 1024 * 1024 * 1024 * 1024,
+              modifier: "David",
+              modifyOn: "2018-01-01 12:50"
+            }
+          ]
         },
         {
-          id: 22,
-          group: "Group2",
-          name: "Maintain Pic 2",
-          ext: "jpg",
-          size: 123 * 1024 * 1024 * 1024,
-          updater: "David",
-          updateTime: "2018-01-01 12:40"
+          id: 30,
+          type: "folder",
+          name: "Folder 2 - Empty",
+          children: []
         },
         {
-          id: 23,
-          group: "Group2",
-          name: "Maintain Record",
-          ext: "docx",
-          size: 100 * 1024 * 1024 * 1024 * 1024,
-          updater: "David",
-          updateTime: "2018-01-01 12:50"
+          id: 40,
+          type: "file",
+          name: "Changelog",
+          ext: "md",
+          size: 100 * 1024,
+          modifier: "John",
+          modifyOn: "2018-01-01 12:35"
+        },
+        {
+          id: 50,
+          type: "folder",
+          name: "Folder 3",
+          children: [
+            {
+              id: 51,
+              type: "file",
+              name: "File 1",
+              ext: "jpg",
+              size: 123 * 1024 * 1024 * 1024,
+              modifier: "David",
+              modifyOn: "2018-01-01 12:40"
+            },
+            {
+              id: 52,
+              type: "file",
+              name: "File 2",
+              ext: "docx",
+              size: 100 * 1024 * 1024 * 1024 * 1024,
+              modifier: "David",
+              modifyOn: "2018-01-01 12:50"
+            }
+          ]
         }
       ],
       selectionNames: ""
@@ -120,44 +168,40 @@ export default {
     "st-table": table
   },
   computed: {
-    group() {
-      return this.ui.groupable
+    picker() {
+      return this.ui.showRowNumber || this.ui.showRowPicker
         ? {
-            prop: "group",
-            names: ["Group1", "DefaultGroupA", "DefaultGroupB"],
-            selectable: this.ui.showRowPicker,
+            component: "st-cell-row-picker",
+            showNumber: this.ui.showRowNumber,
+            showPicker: this.ui.showRowPicker
+          }
+        : false;
+    },
+    group() {
+      return this.ui.expandFolder
+        ? {
+            id: "name",
+            predicate(row) {
+              return row.type === "folder";
+            },
+            colspan: this.ui.groupCellColspan,
             cell: this.ui.editable
-              ? { component: "st-cell-text-editor" }
+              ? { component: "st-cell-text-editor", mutate: true }
               : { component: "st-cell-text" }
           }
-        : "";
+        : null;
     },
     columns() {
       return [
-        {
-          id: "id",
-          label: "ID",
-          width: "4em",
-          cell: this.ui.showRowPicker
-            ? {
-                component: "st-cell-row-picker",
-                showRowNumber: this.ui.showRowNumber
-              }
-            : {
-                component: this.ui.showRowNumber
-                  ? "st-cell-row-number"
-                  : "st-cell-text"
-              }
-        },
         {
           id: "name",
           label: "Name",
           width: "16em",
           cell: this.ui.editable
-            ? { component: "st-cell-text-editor" }
+            ? { component: "st-cell-text-editor", mutate: true }
             : { component: "st-cell-text" }
         },
-        { id: "ext", label: "Type", width: "3em", cell: { class: "ext" } },
+        { id: "ext", label: "Type", width: "4em", cell: { class: "ext" } },
         {
           id: "size",
           label: "Size",
@@ -172,33 +216,43 @@ export default {
           }
         },
         {
-          id: "updateTime",
-          label: "UpdateTime",
+          id: "modifyOn",
+          label: "Last Modified",
           width: "13em",
           cell: {
             component: "st-cell-html",
             render: function(value, row) {
-              return `${value} <i><u>${row.updater}</u></i>`;
+              return `${value} <i><u>${row.modifier}</u></i>`;
             }
           }
         }
       ];
     }
   },
-  watch: {},
+  created() {
+    document.body.style.backgroundColor = this.ui.dark ? "#000" : "#fff";
+  },
+  watch: {
+    "ui.dark"(value) {
+      document.body.style.backgroundColor = value ? "#000" : "#fff";
+    }
+  },
   mounted() {},
   methods: {
-    cellChange($event) {
+    rowPickEvent($event) {
+      console.log("rowPickEvent=%o", $event);
+    },
+    cellChangeEvent($event) {
       console.log(
         "cell change RC[%d, %d]: newValue=%s, oldValue=%s, $event=%o",
-        $event.rowIndex,
-        $event.columnIndex,
+        $event.row.rowIndex,
+        $event.cellIndex,
         $event.newValue,
         $event.oldValue,
         $event
       );
     },
-    cellClick($event) {
+    cellClickEvent($event) {
       console.log(
         "cell click RC[%d, %d]: target=%s",
         $event.rowIndex,
@@ -209,13 +263,8 @@ export default {
     deleteSelection($event) {
       this.$refs.myTable.deleteSelection();
     },
-    selectionChange(selection, oldValue) {
+    selectionChangeEvent(selection) {
       this.selectionNames = selection.map(r => r.name).join(", ");
-      console.log(
-        "selectionChange: new=%s, old=%s",
-        this.selectionNames,
-        oldValue.map(r => r.name).join(", ")
-      );
     }
   }
 };

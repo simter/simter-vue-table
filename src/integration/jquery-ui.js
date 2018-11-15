@@ -6,10 +6,8 @@ import { deepAssign } from "../utils/smart-assign";
 // table's classes config
 const classes = {
   table: ["ui-widget-content"],
-  thead: {
-    tr: "st-row",
-    th: "st-cell"
-  }
+  headerRow: "st-row",
+  headerCell: "st-cell"
 }
 const inherit = "border-color:inherit;border-style:inherit;border-width:inherit";
 const styles = {

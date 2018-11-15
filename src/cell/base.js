@@ -1,67 +1,77 @@
 export default {
   props: {
-    // column
-    columnIndex: { type: Number, required: true },
-    column: { type: Object, required: true },
-
-    // row
-    rowIndex: { type: Number, required: true },
+    /**
+     * The cell's id. 
+     * Mostly use to record column.id for write back new value to origin row's data.
+     */
+    id: { type: [Number, String], required: false },
+    /** The cell's index */
+    cellIndex: { type: Number, required: true },
+    /** cell backend value */
+    value: { required: true },
+    /** 
+     * The belong row of this cell.
+     * row: {value, rowIndex, index, group}
+     * 1. row.group - {value, rowIndex, index}, the upper
+     * 2. row.value - the origin row data
+     * 3. row.rowIndex - the rowIndex in the table
+     * 4. row.index - the array index in the origin rows or row.children
+     * 
+     * If the row has no upper belong group-row, there will be no group property.
+     */
     row: { type: Object, required: true },
 
-    // groupRow
-    groupRow: { type: Object, required: false }
+    // control each descendant dom element class
+    classes: { type: Object, required: false, default() { return {} } },
+
+    // control each descendant dom element style
+    styles: { type: Object, required: false, default() { return {} } },
+
+    // a render function to convert cell's value to a visable label
+    render: { type: Function, required: false },
+
+    // wherther to mutate the origin row's value if this is a editable cell
+    mutate: { type: Boolean, required: false, default: false }
   },
   computed: {
-    // cell config by column
-    cfg() {
-      return this.column.cell || {};
-    },
-    // cell backend value
-    value() {
-      return this.row[this.column.id];
-    },
-    // cell frontend content, text or html
-    content() {
-      return this.cfg.render
+    /** cell frontend content, text or html */
+    label() {
+      return this.render
         // render(value, row)
         // can get more component instance data from `this`
-        ? this.cfg.render.call(this, this.value, this.row)
+        ? this.render.call(this, this.value, this.row.value)
         // origin value
         : this.value;
     },
-    // zero base RC string, such as '[1, 3]'
+    /** 
+     * zero base global RC string, such as '[1, 3]'.
+     * Not include picker column.
+     */
     rc() {
-      return `[${this.rowIndex}, ${this.columnIndex}]`;
-    },
-    // control each descendant dom element class
-    classes() {
-      return this.cfg.classes || {};
-    },
-    // control each descendant dom element style
-    styles() {
-      return this.cfg.styles || {};
+      return `[${this.row.rowIndex}, ${this.cellIndex}]`;
     }
   },
   methods: {
-    /** Accept the cell value change and emit cell-change event */
-    acceptChange(prop, newValue, oldValue, target) {
-      if (newValue != oldValue) {
-        // console.log("acceptChange %s: newValue=%s, oldValue=%s", this.rc, newValue, oldValue);
+    /** Accept the cell value change and emit change event */
+    acceptChange(mutate, newValue, oldValue, target) {
+      if (newValue == oldValue) return;
+      // console.log("acceptChange %s: id=%s, mutate=%s, newValu=%s, oldValue=%s", this.rc, this.id, mutate, newValue, oldValue);
 
-        // update the row data
-        this.$set(this.row, prop, newValue);
-
-        // emit cell change event
-        const data = {
-          newValue, oldValue,
-          columnIndex: this.columnIndex,
-          column: this.column,
-          rowIndex: this.rowIndex,
-          row: this.row
-        }
-        if (target) data.target = target
-        this.$emit("cell-change", data);
+      // update the origin row data
+      if (mutate && this.id) {
+        //console.log("mutate the origin row data for '%s'", this.id)
+        this.$set(this.row.value, this.id, newValue);
       }
+
+      // emit change event
+      const data = {
+        newValue, oldValue,
+        cellIndex: this.cellIndex,
+        row: this.row
+      }
+      if (this.id) data.id = this.id
+      if (mutate) data.mutate = mutate
+      this.$emit("change", data);
     }
   }
 }

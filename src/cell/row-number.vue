@@ -1,5 +1,5 @@
 <template>
-<span>{{groupRow ? rowIndex - groupRow.rowIndex : rowIndex + 1}}</span>
+<span>{{rowIndex + 1}}</span>
 </template>
 
 <script>
