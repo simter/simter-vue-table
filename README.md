@@ -6,7 +6,7 @@ A [Vue] component used to generate HTML \<[table]\> element.
 
 Options:
 
-| Name_________ | Require | ValueType    | Description
+| Name___________ | Require | ValueType  | Description
 |---------------|---------|--------------|-------------
 | columns       | true    | \[{}\]       | Define table columns
 | ├ id          | false   | String       | The column's id, it's the key in the `rows` item
