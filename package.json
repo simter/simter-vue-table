@@ -47,7 +47,7 @@
     "rollup-plugin-node-resolve": "~3.4.0",
     "rollup-plugin-vue": "~4.3.2",
     "simter-vue-colgroup": "~0.3.0",
-    "simter-vue-thead": "^0.3.2",
+    "simter-vue-thead": "^0.4.2",
     "stylus": "~0.54.5",
     "uglify-es": "~3.3.9",
     "vue": "~2.5.17",
