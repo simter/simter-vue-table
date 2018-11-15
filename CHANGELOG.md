@@ -1,5 +1,9 @@
 # simter-vue-table changelog
 
+## 0.5.0 2018-11-02
+
+- Add group support
+
 ## 0.4.0 2018-10-10
 
 - Add classes and styles pros support
