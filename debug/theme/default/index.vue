@@ -48,7 +48,7 @@
     </st-table>
   </div>
   <div class="options" style="border: none" v-if="selectionNames">
-    <input type="button" @click.stop.prevent="deleteSelection()" value="删除选中的行">
+    <input type="button" @click.stop.prevent="deleteSelection()" value="Delete selected">
     {{selectionNames}}
   </div>
 </form>
