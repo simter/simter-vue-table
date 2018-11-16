@@ -26,11 +26,9 @@
     "dev": "parcel debug/index.html -d temp",
     "test": "ava",
     "clean": "rm -rf dist/* temp/*",
-    "build": "npm run clean && npm test && rollup -c && npm run build-jqui && npm run min-js && npm run min-jqui-js",
-    "build-jqui": "rollup -c rollup.config.jqui.js",
+    "build": "npm run clean && npm test && rollup -c && npm run min-js",
     "copy-to": "cp dist/* /to-path",
     "min-js": "uglifyjs --comments /^!/ dist/simter-vue-table.js -o dist/simter-vue-table.min.js --source-map=url",
-    "min-jqui-js": "uglifyjs --comments /^!/ dist/simter-vue-table-integration-jquery-ui.js -o dist/simter-vue-table-integration-jquery-ui.min.js --source-map=url",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
