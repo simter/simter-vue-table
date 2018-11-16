@@ -4,6 +4,7 @@ import resolve from 'rollup-plugin-node-resolve';
 
 let banner = `/*!
 * ${pkg.name} v${pkg.version}
+* ${pkg.repository} 
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */`

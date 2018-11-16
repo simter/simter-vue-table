@@ -1,5 +1,6 @@
 /*!
-* simter-vue-table v0.6.0
+* simter-vue-table v0.6.1
+* https://github.com/simter/simter-vue-table.git 
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
 */
@@ -778,6 +779,7 @@
     );
 
   //
+
   var script$2 = {
     extends: cellBase,
     props: {
@@ -801,13 +803,24 @@
               t => t.row.group && t.row.group.rowIndex === this.row.rowIndex
             )
             .forEach(t => {
-              if (t.picked != this.picked) t.picked = this.picked;
+              if (t.picked !== this.picked) t.picked = this.picked;
             });
-        } else if (this.row.group && !this.picked) {
+        } else if (this.row.group) {
           // unpick group row's picker if it is picked
-          this.$parent.$refs.groupRowPicker
-            .filter(t => t.row.rowIndex === this.row.group.rowIndex)
-            .forEach(t => t.picked && (t.picked = false));
+          let groupRowPicker = this.$parent.$refs.groupRowPicker
+            .filter(t => t.row.rowIndex === this.row.group.rowIndex);
+          if (!this.picked) {
+            groupRowPicker.forEach(t => t.picked && (t.picked = false));
+          } else {
+            // picked group if all children of the group are picked
+            if (
+              this.$parent.$refs.rowPicker
+                .filter(
+                  t => t.row.group && t.row.group.rowIndex === this.row.group.rowIndex
+                )
+                .every(t => t.picked)
+            ) groupRowPicker.forEach(t => t.picked = true);
+          }
         }
 
         // emit pick event

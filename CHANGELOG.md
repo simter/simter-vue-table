@@ -1,5 +1,11 @@
 # simter-vue-table changelog
 
+## 0.6.1 2018-11-16
+
+- Remove simter-vue-table-integration-jquery-ui build
+- Fixed 'rollup -c' warning
+- Perfect the row-picker: picked group if all its children are picked
+
 ## 0.6.0 2018-11-15
 
 - Refactor group feature
