@@ -255,7 +255,7 @@ const component = {
     $_rowPickEvent($event) {
       if ($event.picked) this.selection.push($event.row);
       else {
-        const index = this.selection.indexOf($event.row);
+        const index = this.selection.map(t => t.value).indexOf($event.row.value);
         if (index > -1) this.selection.splice(index, 1);
       }
     },
