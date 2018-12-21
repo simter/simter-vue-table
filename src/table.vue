@@ -259,32 +259,33 @@ const component = {
         if (index > -1) this.selection.splice(index, 1);
       }
     },
-    deleteSelection() {
-      // 逆序排序
-      const toRemove = this.selection.sort((r1, r2) => {
-        if (!r1.group && !r2.group) {
-          // 同为 1 级节点
-          return r2.index - r1.index;
-        } else if (r1.group && r2.group) {
-          // 同为 2 级节点
-          const d = r2.group.index - r1.group.index;
-          return d == 0 ? r2.index - r1.index : d;
-        } else if (r1.group && !r2.group) {
-          // 1 级节点与 2 级节点
-          return r2.index - r1.group.index;
+    deleteSelection(keepGroup) {
+      let selection = this.selection.map(t => t.value);
+
+      // When adding rows, the index recorded when the row is selected may be wrong
+      // Tiling the two-layer structure and reverse it
+      let rows = this.rows.reduce((array, firstLayer, firstIndex) => {
+        array.push({firstIndex: firstIndex, secondIndex: -1, value: firstLayer});
+        if (firstLayer.children) {
+          return array.concat(firstLayer.children.map((it, index) => {
+            return {firstIndex: firstIndex, secondIndex: index, value: it}
+          }))
         } else {
-          // 2 级节点与 1 级节点
-          return r2.group.index - r1.index;
+          return array
+        }
+      }, []).reverse();
+
+      // delete selection row for this rows
+      rows.forEach(r => {
+        if (selection.indexOf(r.value) !== -1) {
+          if (r.secondIndex === -1) {
+            if (!keepGroup || !r.value.children) this.$delete(this.rows, r.firstIndex);
+          } else {
+            this.$delete(this.rows[r.firstIndex].children, r.secondIndex);
+          }
         }
       });
-
-      // 逆向从数组中删除元素
-      toRemove.forEach(row => {
-        if (row.group) {
-          this.$delete(this.rows[row.group.index].children, row.index);
-        } else this.$delete(this.rows, row.index);
-      });
-      this.selection = []
+      this.selection = [];
     },
     generateRowsHelper() {
       // generate rows helper to save some specific data.
