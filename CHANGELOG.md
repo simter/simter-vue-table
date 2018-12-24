@@ -1,5 +1,11 @@
 # simter-vue-table changelog
 
+## 0.7.0 2018-12-24
+
+- Enables row data to decide the picked value of picker component
+- Fixed the selection list is wrong when deselect
+- Fixed the rows are wrong when deselecit after add row
+
 ## 0.6.1 2018-11-16
 
 - Remove simter-vue-table-integration-jquery-ui build

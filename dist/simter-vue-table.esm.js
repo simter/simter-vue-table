@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table v0.6.1
+* simter-vue-table v0.7.0
 * https://github.com/simter/simter-vue-table.git 
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
@@ -782,43 +782,61 @@ var script$2 = {
     showPicker: { type: Boolean, required: false, default: true }
   },
   data() {
-    return { picked: false };
+    return { picked_: false };
   },
-  created() {
-    // init the picked value
-    if (this.id) this.picked = this.row.value[this.id];
+  computed:{
+    picked:{
+      get() {
+        if (this.isGroupPicker) {
+          return this.picked_;
+        } else if (this.id) {
+          return this.row.value[this.id];
+        } else {
+          return this.picked_;
+        }
+      },
+      set(value) {
+        if (this.isGroupPicker) {
+          this.picked_ = value;
+        } else {
+          if (this.id) {
+            this.row.value[this.id] = value;
+          } else {
+            this.picked_ = value;
+          }
+          if (this.row.group) {
+            // unpick group row's picker if it is picked
+            let groupRowPicker = this.$parent.$refs.groupRowPicker
+              .filter(t => t.row.rowIndex === this.row.group.rowIndex);
+            if (!value) {
+              groupRowPicker.forEach(t => t.picked && (t.picked = false));
+            } else {
+              // picked group if all children of the group are picked
+              if (
+                this.$parent.$refs.rowPicker
+                  .filter(
+                    t => t.row.group && t.row.group.rowIndex === this.row.group.rowIndex
+                  )
+                  .every(t => t.picked)
+              ) groupRowPicker.forEach(t => !t.picked && (t.picked = true));
+            }
+          }
+        }
+        this.$emit("pick", {picked: value, row: this.row});
+      }
+    }
+  },
+  created(){
   },
   methods: {
-    pickedEvent() {
-      if (this.isGroupPicker) {
-        // pick all the children row
-        this.$parent.$refs.rowPicker
-          .filter(
-            t => t.row.group && t.row.group.rowIndex === this.row.rowIndex
-          )
-          .forEach(t => {
-            if (t.picked !== this.picked) t.picked = this.picked;
-          });
-      } else if (this.row.group) {
-        // unpick group row's picker if it is picked
-        let groupRowPicker = this.$parent.$refs.groupRowPicker
-          .filter(t => t.row.rowIndex === this.row.group.rowIndex);
-        if (!this.picked) {
-          groupRowPicker.forEach(t => t.picked && (t.picked = false));
-        } else {
-          // picked group if all children of the group are picked
-          if (
-            this.$parent.$refs.rowPicker
-              .filter(
-                t => t.row.group && t.row.group.rowIndex === this.row.group.rowIndex
-              )
-              .every(t => t.picked)
-          ) groupRowPicker.forEach(t => t.picked = true);
-        }
-      }
-
-      // emit pick event
-      this.$emit("pick", { picked: this.picked, row: this.row });
+    pickedGroupEvent() {
+      // pick all the children row
+      this.$parent.$refs.rowPicker
+        .filter(t => t.row.group && t.row.group.rowIndex === this.row.rowIndex)
+        .forEach(t => {
+          if (t.picked !== this.picked_) t.picked = this.picked_;
+        });
+      this.$emit("pick", {picked: this.picked_, row: this.row});
     }
   }
 };
@@ -838,7 +856,55 @@ var __vue_render__$4 = function() {
       style: _vm.styles.container
     },
     [
-      _vm.showPicker
+      _vm.showPicker && this.isGroupPicker
+        ? _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.picked_,
+                expression: "picked_"
+              }
+            ],
+            class: _vm.classes.picker,
+            style: _vm.styles.picker,
+            attrs: { type: "checkbox" },
+            domProps: {
+              checked: Array.isArray(_vm.picked_)
+                ? _vm._i(_vm.picked_, null) > -1
+                : _vm.picked_
+            },
+            on: {
+              change: [
+                function($event) {
+                  var $$a = _vm.picked_,
+                    $$el = $event.target,
+                    $$c = $$el.checked ? true : false;
+                  if (Array.isArray($$a)) {
+                    var $$v = null,
+                      $$i = _vm._i($$a, $$v);
+                    if ($$el.checked) {
+                      $$i < 0 && (_vm.picked_ = $$a.concat([$$v]));
+                    } else {
+                      $$i > -1 &&
+                        (_vm.picked_ = $$a
+                          .slice(0, $$i)
+                          .concat($$a.slice($$i + 1)));
+                    }
+                  } else {
+                    _vm.picked_ = $$c;
+                  }
+                },
+                function($event) {
+                  $event.stopPropagation();
+                  return _vm.pickedGroupEvent($event)
+                }
+              ]
+            }
+          })
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.showPicker && !this.isGroupPicker
         ? _c("input", {
             directives: [
               {
@@ -857,31 +923,25 @@ var __vue_render__$4 = function() {
                 : _vm.picked
             },
             on: {
-              change: [
-                function($event) {
-                  var $$a = _vm.picked,
-                    $$el = $event.target,
-                    $$c = $$el.checked ? true : false;
-                  if (Array.isArray($$a)) {
-                    var $$v = null,
-                      $$i = _vm._i($$a, $$v);
-                    if ($$el.checked) {
-                      $$i < 0 && (_vm.picked = $$a.concat([$$v]));
-                    } else {
-                      $$i > -1 &&
-                        (_vm.picked = $$a
-                          .slice(0, $$i)
-                          .concat($$a.slice($$i + 1)));
-                    }
+              change: function($event) {
+                var $$a = _vm.picked,
+                  $$el = $event.target,
+                  $$c = $$el.checked ? true : false;
+                if (Array.isArray($$a)) {
+                  var $$v = null,
+                    $$i = _vm._i($$a, $$v);
+                  if ($$el.checked) {
+                    $$i < 0 && (_vm.picked = $$a.concat([$$v]));
                   } else {
-                    _vm.picked = $$c;
+                    $$i > -1 &&
+                      (_vm.picked = $$a
+                        .slice(0, $$i)
+                        .concat($$a.slice($$i + 1)));
                   }
-                },
-                function($event) {
-                  $event.stopPropagation();
-                  return _vm.pickedEvent($event)
+                } else {
+                  _vm.picked = $$c;
                 }
-              ]
+              }
             }
           })
         : _vm._e(),
@@ -1375,34 +1435,35 @@ const component$2 = {
     $_rowPickEvent($event) {
       if ($event.picked) this.selection.push($event.row);
       else {
-        const index = this.selection.indexOf($event.row);
+        const index = this.selection.map(t => t.value).indexOf($event.row.value);
         if (index > -1) this.selection.splice(index, 1);
       }
     },
-    deleteSelection() {
-      // 逆序排序
-      const toRemove = this.selection.sort((r1, r2) => {
-        if (!r1.group && !r2.group) {
-          // 同为 1 级节点
-          return r2.index - r1.index;
-        } else if (r1.group && r2.group) {
-          // 同为 2 级节点
-          const d = r2.group.index - r1.group.index;
-          return d == 0 ? r2.index - r1.index : d;
-        } else if (r1.group && !r2.group) {
-          // 1 级节点与 2 级节点
-          return r2.index - r1.group.index;
-        } else {
-          // 2 级节点与 1 级节点
-          return r2.group.index - r1.index;
-        }
-      });
+    deleteSelection(keepGroup) {
+      let selection = this.selection.map(t => t.value);
 
-      // 逆向从数组中删除元素
-      toRemove.forEach(row => {
-        if (row.group) {
-          this.$delete(this.rows[row.group.index].children, row.index);
-        } else this.$delete(this.rows, row.index);
+      // When adding rows, the index recorded when the row is selected may be wrong
+      // Tiling the two-layer structure and reverse it
+      let rows = this.rows.reduce((array, firstLayer, firstIndex) => {
+        array.push({firstIndex: firstIndex, secondIndex: -1, value: firstLayer});
+        if (firstLayer.children) {
+          return array.concat(firstLayer.children.map((it, index) => {
+            return {firstIndex: firstIndex, secondIndex: index, value: it}
+          }))
+        } else {
+          return array
+        }
+      }, []).reverse();
+
+      // delete selection row for this rows
+      rows.forEach(r => {
+        if (selection.indexOf(r.value) !== -1) {
+          if (r.secondIndex === -1) {
+            if (!keepGroup || !r.value.children) this.$delete(this.rows, r.firstIndex);
+          } else {
+            this.$delete(this.rows[r.firstIndex].children, r.secondIndex);
+          }
+        }
       });
       this.selection = [];
     },
