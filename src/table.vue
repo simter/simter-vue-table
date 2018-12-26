@@ -145,6 +145,11 @@ const component = {
       }
     },
     group: { type: [String, Object], required: false },
+    /**
+     * Set 'picker.id' so that you can control the row picked through row data.
+     * Control the group row picked when the group row has children row,
+     *   you should indirectly through children row data rather than directly through group row data.
+     */
     picker: { type: [Boolean, String, Object], required: false, default: false },
     id: { type: String, required: false }
   },
