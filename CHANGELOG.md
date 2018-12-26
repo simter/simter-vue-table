@@ -1,5 +1,9 @@
 # simter-vue-table changelog
 
+## 0.7.1 2018-12-26
+
+- Fixed selection list did not change when the row data changed the row picked
+
 ## 0.7.0 2018-12-24
 
 - Enables row data to decide the picked value of picker component
