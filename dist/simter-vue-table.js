@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table v0.7.1
+* simter-vue-table v0.7.2
 * https://github.com/simter/simter-vue-table.git 
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
@@ -124,7 +124,7 @@
     );
 
   /*!
-  * simter-vue-thead v0.4.2
+  * simter-vue-thead v0.4.3
   * @author RJ.Hwang <rongjihuang@gmail.com>
   * @license MIT
   */
@@ -356,7 +356,8 @@
    * 1. ["a", "b"] flatten to ["a", "b"]
    * 2. ["a", {children: ["b", "c"]}] flatten to ["a", {children: ["b", "c"]}, "b", "c"]
    */
-  function flattenWithSelf(columns, removeChildren = true) {
+  function flattenWithSelf(columns, removeChildren) {
+    if (removeChildren === null || removeChildren === undefined) removeChildren = true;
     let result = columns.reduce((a, b) => {
       if (b.children) {
         return a.concat(b, flattenWithSelf(b.children, removeChildren));
@@ -440,9 +441,11 @@
               },
               [_vm._v(_vm._s(cell.label || cell))]
             )
-          })
+          }),
+          0
         )
-      })
+      }),
+      0
     )
   };
   var __vue_staticRenderFns__$1 = [];
@@ -465,7 +468,7 @@
       const component$$1 = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component$$1.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-thead\\src\\thead.vue";
+      component$$1.__file = "D:\\work\\simter\\simter-vue\\simter-vue-thead\\src\\thead.vue";
 
       if (!component$$1.render) {
         component$$1.render = template.render;
@@ -683,7 +686,7 @@
       const component = (typeof script$$1 === 'function' ? script$$1.options : script$$1) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\text.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\cell\\text.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -747,7 +750,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\html.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\cell\\html.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -990,7 +993,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\row-picker.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\cell\\row-picker.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -1054,7 +1057,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\row-number.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\cell\\row-number.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -1134,7 +1137,7 @@
           function($event) {
             if (
               !("button" in $event) &&
-              _vm._k($event.keyCode, "esc", 27, $event.key, "Escape")
+              _vm._k($event.keyCode, "esc", 27, $event.key, ["Esc", "Escape"])
             ) {
               return null
             }
@@ -1165,7 +1168,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\text-editor.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\cell\\text-editor.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -1245,7 +1248,7 @@
           function($event) {
             if (
               !("button" in $event) &&
-              _vm._k($event.keyCode, "esc", 27, $event.key, "Escape")
+              _vm._k($event.keyCode, "esc", 27, $event.key, ["Esc", "Escape"])
             ) {
               return null
             }
@@ -1276,7 +1279,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\cell\\number-editor.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\cell\\number-editor.vue";
 
       if (!component.render) {
         component.render = template.render;
@@ -1887,7 +1890,8 @@
           ],
           2
         )
-      ]
+      ],
+      1
     )
   };
   var __vue_staticRenderFns__$8 = [];
@@ -1910,7 +1914,7 @@
       const component = (typeof script === 'function' ? script.options : script) || {};
 
       // For security concerns, we use only base name in production mode.
-      component.__file = "D:\\work\\github-simter\\simter-vue\\simter-vue-table\\src\\table.vue";
+      component.__file = "D:\\work\\simter\\simter-vue\\simter-vue-table\\src\\table.vue";
 
       if (!component.render) {
         component.render = template.render;

@@ -1,5 +1,8 @@
 # simter-vue-table changelog
 
+## 0.7.2 2018-12-26
+- Fix simter-vue-thead Support Chrome 46
+
 ## 0.7.1 2018-12-26
 
 - Fixed selection list did not change when the row data changed the row picked
