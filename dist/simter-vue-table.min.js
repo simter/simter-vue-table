@@ -1,5 +1,5 @@
 /*!
-* simter-vue-table v0.7.1
+* simter-vue-table v0.7.2
 * https://github.com/simter/simter-vue-table.git 
 * @author RJ.Hwang <rongjihuang@gmail.com>
 * @license MIT
